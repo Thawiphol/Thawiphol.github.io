@@ -2,7 +2,7 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเองรายวัน (A4 แนวนอน)</title>
+  <title>แผนพัฒนาตนเองรายวัน (Full A4 Landscape)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10,33 +10,27 @@
   <style>
     :root {
       --primary-color: #c19a6b;
-      --bg-color: #fef9f3;
-      --border-color: #e0e0e0;
+      --bg-color: #f3f4f6;
     }
     
     body {
       box-sizing: border-box;
       font-family: 'Sarabun', sans-serif;
-      background-color: #f3f4f6; /* สีพื้นหลังเว็บ */
+      background-color: var(--bg-color);
     }
 
-    /* Custom scrollbars */
-    .app-wrapper::-webkit-scrollbar { width: 8px; }
-    .app-wrapper::-webkit-scrollbar-track { background: transparent; }
-    .app-wrapper::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
     .focus-ring:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
-    /* --- CSS สำหรับหน้าจอปกติ (Screen) --- */
-    #planner-card {
-        background-color: #fff;
-        transition: all 0.3s ease;
-    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
 
-    /* --- CSS สำหรับการพิมพ์ (Print / PDF) - หัวใจสำคัญของ A4 แนวนอน --- */
+    /* --- CSS สำหรับการพิมพ์ (Print / Save PDF) --- */
     @media print {
         @page {
-            size: A4 landscape; /* บังคับแนวนอน */
-            margin: 0; 
+            size: A4 landscape; /* กระดาษแนวนอน */
+            margin: 0;          /* ตัดขอบขาวออกให้หมด */
         }
         
         body {
@@ -45,14 +39,17 @@
             background-color: white !important;
             -webkit-print-color-adjust: exact !important; 
             print-color-adjust: exact !important;
-            width: 297mm;
-            height: 210mm;
-            overflow: hidden; /* ห้ามมี Scrollbar */
+            width: 297mm;  /* ความกว้าง A4 แนวนอน */
+            height: 210mm; /* ความสูง A4 แนวนอน */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .no-print { display: none !important; } /* ซ่อนปุ่มต่างๆ */
+        .no-print { display: none !important; }
 
-        .app-wrapper, #planner-root {
+        .app-wrapper {
             display: block !important;
             width: 100% !important;
             height: 100% !important;
@@ -62,56 +59,59 @@
             background-color: white !important;
         }
 
+        /* Container หลักสำหรับการพิมพ์ */
         #planner-card {
-            width: 297mm !important;
-            height: 210mm !important;
-            max-width: none !important;
-            margin: 0 !important;
-            padding: 8mm 12mm !important; /* เว้นขอบซ้ายขวา */
+            width: 290mm !important; /* กว้างเกือบเต็ม A4 */
+            height: 200mm !important; /* สูงเกือบเต็ม A4 */
+            margin: auto !important;
+            padding: 10px 20px !important;
             border: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
+            
+            /* บังคับ Layout ให้เหมือนหน้าจอ (2 คอลัมน์) */
             display: flex !important;
-            flex-direction: column;
+            flex-direction: column !important;
         }
 
-        /* จัด Layout ใหม่เป็น 3 คอลัมน์ด้วย Grid */
+        /* ส่วนหัว */
+        header {
+            padding: 10px 0 !important;
+            margin-bottom: 10px !important;
+        }
+        h1#main-title { font-size: 24pt !important; }
+        
+        /* จัด Grid เนื้อหา */
         #planner-content-grid {
             display: grid !important;
-            grid-template-columns: 1fr 1.2fr 1fr !important; /* แบ่ง 3 ส่วน (กลางกว้างหน่อย) */
-            grid-template-rows: auto 1fr !important; 
-            gap: 1rem !important;
-            height: 100% !important;
-            align-content: stretch;
+            grid-template-columns: 1fr 1fr !important; /* บังคับ 2 คอลัมน์ซ้ายขวา เหมือนหน้าจอ */
+            gap: 15px !important;
+            flex: 1;
+            height: auto !important;
         }
 
-        /* ใช้ display: contents เพื่อให้ลูกๆ ของ section มารวมอยู่ใน grid หลัก */
-        .section-wrapper {
-            display: contents !important;
+        /* ปรับขนาดตัวอักษรและช่องว่างให้พอดีกระดาษ */
+        section { padding: 0 !important; }
+        article { 
+            border: 1px solid #ddd !important; /* เพิ่มเส้นขอบบางๆ ตอนปริ้น */
+            box-shadow: none !important;
+            border-radius: 8px !important;
         }
-
-        /* --- จัดตำแหน่งกล่องต่างๆ ใน Grid 3 คอลัมน์ --- */
-        
-        /* คอลัมน์ 1: ซ้าย */
-        #article-mindset { grid-column: 1; grid-row: 1; }
-        #article-focus { grid-column: 1; grid-row: 2; height: auto !important; }
-
-        /* คอลัมน์ 2: กลาง (ยาวตลอดแนว) */
-        #article-tasks { grid-column: 2; grid-row: 1 / span 2; height: 100% !important; }
-
-        /* คอลัมน์ 3: ขวา */
-        #article-health { grid-column: 3; grid-row: 1; }
-        #article-growth { grid-column: 3; grid-row: 2; height: auto !important; }
-
-        /* ปรับขนาดฟอนต์สำหรับการพิมพ์ */
-        * { font-size: 10pt !important; }
-        h1#main-title { font-size: 20pt !important; }
-        h2 { font-size: 11pt !important; }
-        textarea { resize: none !important; }
         
         /* ซ่อนเงา (Shadow divs) ตอนพิมพ์เพื่อให้สะอาดตา */
         .shadow-offset { display: none !important; }
-        .card-container { border: 1px solid #ccc !important; }
+        
+        /* ลดขนาดพื้นที่ว่าง (Padding/Margin) เพื่อให้ยัดลง A4 ได้หมด */
+        .p-4 { padding: 10px !important; }
+        .gap-6 { gap: 10px !important; }
+        .gap-5 { gap: 10px !important; }
+        
+        /* ปรับ Textarea/Input */
+        textarea { resize: none !important; }
+        input, textarea, select { 
+            background-color: #fff !important; 
+            border: 1px solid #ccc !important;
+        }
     }
   </style>
  </head>
@@ -119,13 +119,14 @@
   
   <div id="app-root" class="app-wrapper h-full w-full overflow-auto flex items-center justify-center p-4">
    <div id="planner-root" class="w-full flex items-center justify-center">
-    <main id="planner-card" class="w-full max-w-5xl rounded-2xl shadow-xl flex flex-col bg-white min-h-[800px]">
+    
+    <main id="planner-card" class="w-full max-w-6xl rounded-2xl shadow-xl flex flex-col bg-white min-h-[800px] border border-gray-200">
      
-     <header class="w-full px-8 pt-6 pb-4 border-b flex flex-col gap-2">
+     <header class="w-full px-8 pt-6 pb-2 border-b flex flex-col gap-2">
       <div class="flex flex-wrap items-center justify-between gap-4">
        <div class="space-y-1">
         <h1 id="main-title" class="font-bold tracking-wide text-2xl text-gray-800 uppercase">โปรแกรมพัฒนาตนเองรายวัน</h1>
-        <p id="subtitle-text" class="text-sm text-gray-500">สร้างนิสัยดี ฝึกจิตใจ เสริมสร้างร่างกาย</p>
+        <p class="text-sm text-gray-500">Daily Self-Development Planner</p>
        </div>
        <div class="flex flex-col items-end gap-1">
         <label for="date-input" class="text-xs text-gray-500 font-semibold">DATE</label> 
@@ -134,63 +135,53 @@
       </div>
      </header>
 
-     <section class="flex-1 w-full px-6 py-6">
+     <section class="flex-1 w-full px-6 py-6 overflow-hidden">
       <div id="planner-content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
        
-       <section class="section-wrapper flex flex-col gap-5">
+       <section class="flex flex-col gap-4 h-full">
         
-        <article id="article-mindset" class="relative group">
-         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200 transition-transform"></div>
-         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
-          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-           <span>☀️</span><h2 class="text-sm font-bold uppercase tracking-wider">จิตใจยามเช้า</h2>
-          </div>
-          <div class="p-4 flex-1 flex flex-col gap-2">
-            <label class="text-xs font-semibold text-gray-600">วันนี้ฉันขอบคุณสำหรับ:</label> 
-            <textarea id="gratitude-1" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-xs resize-none h-14" placeholder="1..."></textarea> 
-            <textarea id="gratitude-2" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-xs resize-none h-14" placeholder="2..."></textarea>
-          </div>
-         </div>
-        </article>
+        <div class="grid grid-cols-2 gap-4">
+            <article class="relative group h-full">
+             <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
+             <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+              <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+               <span>☀️</span><h2 class="text-xs font-bold uppercase tracking-wider">จิตใจยามเช้า</h2>
+              </div>
+              <div class="p-3 flex-1 flex flex-col gap-2">
+                <textarea id="gratitude-1" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-2 py-1 text-xs resize-none h-full" placeholder="ขอบคุณ 1..."></textarea> 
+                <textarea id="gratitude-2" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-2 py-1 text-xs resize-none h-full" placeholder="ขอบคุณ 2..."></textarea>
+              </div>
+             </div>
+            </article>
 
-        <article id="article-focus" class="relative group">
+            <article class="relative group h-full">
+             <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
+             <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+              <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+               <span>🎯</span><h2 class="text-xs font-bold uppercase tracking-wider">3 สิ่งสำคัญ</h2>
+              </div>
+              <div class="p-3 flex-1 flex flex-col justify-center gap-2">
+                <input id="prio-1" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="1. สำคัญสุด">
+                <input id="prio-2" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="2. รองลงมา">
+                <input id="prio-3" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="3. รองลงมา">
+              </div>
+             </div>
+            </article>
+        </div>
+
+        <article class="relative group flex-1">
          <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
          <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
-          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-           <span>🎯</span><h2 class="text-sm font-bold uppercase tracking-wider">สิ่งสำคัญ 3 อันดับแรก</h2>
+          <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>📝</span><h2 class="text-xs font-bold uppercase tracking-wider">ตารางเวลา / รายการงาน</h2>
           </div>
-          <div class="p-4 flex-1">
-           <ul class="space-y-3">
-            <li class="flex items-center gap-2">
-                <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-[#c19a6b]" data-role="check-circle"></div> 
-                <input id="prio-1" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-sm bg-gray-50" placeholder="สำคัญที่สุด">
-            </li>
-            <li class="flex items-center gap-2">
-                <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-[#c19a6b]" data-role="check-circle"></div> 
-                <input id="prio-2" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-sm bg-gray-50" placeholder="รองลงมา">
-            </li>
-            <li class="flex items-center gap-2">
-                <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-[#c19a6b]" data-role="check-circle"></div> 
-                <input id="prio-3" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-sm bg-gray-50" placeholder="รองลงมา">
-            </li>
-           </ul>
-          </div>
-         </div>
-        </article>
-
-        <article id="article-tasks" class="relative group flex-1">
-         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
-         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
-          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-           <span>📝</span><h2 class="text-sm font-bold uppercase tracking-wider">ตารางเวลา / งาน</h2>
-          </div>
-          <div class="p-4 flex-1 flex flex-col gap-2 overflow-hidden">
-           <div class="flex flex-col gap-2 h-full">
+          <div class="p-3 flex-1 flex flex-col gap-2 overflow-y-auto">
+           <div class="flex flex-col gap-1.5 h-full">
              <script>
-                for(let i=1; i<=10; i++){
+                for(let i=1; i<=11; i++){
                     document.write(`
                     <div class="flex items-center gap-2">
-                        <span class="text-[10px] text-gray-400 w-8 text-right">${8+i-1}:00</span>
+                        <span class="text-[10px] text-gray-400 w-8 text-right">${7+i-1}:00</span>
                         <div class="w-4 h-4 rounded border border-gray-300 cursor-pointer flex items-center justify-center hover:border-[#c19a6b]" data-role="check-square"></div>
                         <input id="task-${i}" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="">
                     </div>
@@ -203,55 +194,56 @@
         </article>
        </section>
 
-       <section class="section-wrapper flex flex-col gap-5">
+       <section class="flex flex-col gap-4 h-full">
         
-        <article id="article-health" class="relative group">
+        <article class="relative group">
          <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
          <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
-          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-           <span>💪</span><h2 class="text-sm font-bold uppercase tracking-wider">สุขภาพร่างกาย</h2>
+          <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>💪</span><h2 class="text-xs font-bold uppercase tracking-wider">สุขภาพร่างกาย (Body & Health)</h2>
           </div>
-          <div class="p-4 flex-1 flex flex-col gap-4 text-sm">
+          <div class="p-3 flex-1 flex flex-col gap-3 text-sm">
            
-           <div class="flex items-center gap-2 flex-wrap">
-               <span class="font-semibold text-gray-700 w-16">Exercise:</span>
-               <div class="w-4 h-4 rounded border border-gray-300 cursor-pointer" data-role="check-square"></div>
-               <input id="ex-min" type="text" class="focus-ring w-16 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="นาที">
-               <input id="ex-type" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="กิจกรรม">
+           <div class="flex items-center justify-between">
+             <div class="flex items-center gap-2">
+               <span class="font-semibold text-gray-700 text-xs">🏃 ออกกำลังกาย:</span>
+               <input id="ex-min" type="text" class="focus-ring w-12 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="นาที">
+             </div>
+             <input id="ex-type" type="text" class="focus-ring w-32 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="ทำอะไร...">
            </div>
 
-           <div class="flex flex-col gap-1">
-            <span class="font-semibold text-gray-700">Water Intake:</span>
-            <div class="flex gap-2 mt-1">
+           <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-700 text-xs">💧 ดื่มน้ำ:</span>
+            <div class="flex gap-1.5">
                 <script>
                     for(let i=0; i<8; i++){
-                        document.write(`<div class="w-6 h-6 rounded-full border border-blue-300 cursor-pointer flex items-center justify-center text-[10px] text-blue-300 hover:bg-blue-50" data-role="water-drop">💧</div>`);
+                        document.write(`<div class="w-5 h-5 rounded-full border border-blue-300 cursor-pointer flex items-center justify-center text-[8px] text-blue-300 hover:bg-blue-50" data-role="water-drop"></div>`);
                     }
                 </script>
             </div>
            </div>
 
-           <div class="flex items-center gap-2 pt-1">
-            <span class="font-semibold text-gray-700 w-16">Sleep:</span>
-            <input id="sleep-hrs" type="text" class="focus-ring w-16 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="ชั่วโมง">
-            <span class="text-xs text-gray-500">Quality:</span>
+           <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-700 text-xs">💤 การนอน:</span>
+            <input id="sleep-hrs" type="text" class="focus-ring w-12 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="ชม.">
+            <span class="text-xs text-gray-400">|</span>
+            <span class="text-xs text-gray-500">คุณภาพ:</span>
             <select id="sleep-qual" class="focus-ring rounded border-gray-300 px-1 py-1 text-xs bg-gray-50">
-                <option>-</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option>
+                <option>-</option><option>ดีมาก</option><option>ดี</option><option>พอใช้</option><option>แย่</option>
             </select>
            </div>
           </div>
          </div>
         </article>
 
-        <article id="article-growth" class="relative group flex-1">
+        <article class="relative group flex-1">
          <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
          <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
-          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-           <span>📓</span><h2 class="text-sm font-bold uppercase tracking-wider">การเติบโต / สะท้อนความคิด</h2>
+          <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>📓</span><h2 class="text-xs font-bold uppercase tracking-wider">บันทึกการเรียนรู้ / ข้อคิดวันนี้</h2>
           </div>
-          <div class="p-4 flex-1 flex flex-col gap-2 h-full">
-            <label class="text-xs text-gray-500">บทเรียนวันนี้, ไอเดียใหม่, หรือสิ่งที่ต้องปรับปรุง:</label>
-            <textarea id="growth-notes" class="focus-ring w-full flex-1 min-h-[120px] rounded border-gray-300 bg-gray-50 px-3 py-2 text-sm resize-none"></textarea>
+          <div class="p-3 flex-1 flex flex-col gap-2 h-full">
+            <textarea id="growth-notes" class="focus-ring w-full h-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-sm resize-none leading-relaxed" placeholder="วันนี้เรียนรู้อะไร? มีอะไรที่อยากทำให้ดีขึ้นในวันพรุ่งนี้?"></textarea>
           </div>
          </div>
         </article>
@@ -260,25 +252,23 @@
       </div>
      </section>
 
-     <footer class="w-full px-8 py-4 border-t text-[10px] flex items-center justify-between text-gray-400">
-      <p>"ก้าวเล็กๆ ทุกวัน นำไปสู่ความสำเร็จที่ยิ่งใหญ่"</p>
-      <p>Daily Planner - ออกแบบเพื่อการพัฒนาตนเอง</p>
+     <footer class="w-full px-8 py-3 border-t text-[10px] flex items-center justify-between text-gray-400">
+      <p>"Small steps every day lead to big changes."</p>
+      <p>Designed for your success.</p>
      </footer>
     </main>
    </div>
   </div>
 
   <div class="fixed bottom-6 right-6 no-print z-50 flex flex-col gap-3">
-    <button id="reset-btn" class="bg-red-500 hover:bg-red-600 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
-        <span>🔄</span> <span class="text-sm">เริ่มวันใหม่</span>
+    <button id="reset-btn" class="bg-red-500 hover:bg-red-600 text-white shadow-lg rounded-full w-12 h-12 flex items-center justify-center transition-transform transform hover:scale-110" title="เริ่มวันใหม่">
+        <span>🔄</span>
     </button>
-    
-    <button id="save-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
-        <span>💾</span> <span class="text-sm">บันทึก PDF (แนวนอน)</span>
+    <button id="save-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white shadow-lg rounded-full w-12 h-12 flex items-center justify-center transition-transform transform hover:scale-110" title="บันทึก PDF">
+        <span>💾</span>
     </button>
-    
-    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
-        <span>🖨️</span> <span class="text-sm">พิมพ์</span>
+    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full w-12 h-12 flex items-center justify-center transition-transform transform hover:scale-110" title="พิมพ์">
+        <span>🖨️</span>
     </button>
   </div>
 
@@ -286,30 +276,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
-    /* --- Logic หลักของโปรแกรม --- */
+    // --- Logic ส่วนการทำงาน ---
 
-    // 1. จัดการ Checkbox แบบวงกลม (Circle) และ สี่เหลี่ยม (Square) และ หยดน้ำ
     function setupInteractions() {
-        // Circle Checkboxes
-        document.querySelectorAll('[data-role="check-circle"]').forEach(el => {
-            el.addEventListener('click', () => {
-                const isActive = el.classList.contains('bg-[#c19a6b]');
-                if(isActive) {
-                    el.classList.remove('bg-[#c19a6b]', 'border-[#c19a6b]');
-                    el.classList.add('border-gray-300');
-                    el.innerHTML = '';
-                    el.dataset.checked = "false";
-                } else {
-                    el.classList.add('bg-[#c19a6b]', 'border-[#c19a6b]');
-                    el.classList.remove('border-gray-300');
-                    el.innerHTML = '<span class="text-white text-xs flex items-center justify-center h-full">✓</span>';
-                    el.dataset.checked = "true";
-                }
-                saveData();
-            });
-        });
-
-        // Square Checkboxes
+        // Toggle Checkboxes (Square)
         document.querySelectorAll('[data-role="check-square"]').forEach(el => {
             el.addEventListener('click', () => {
                 const isActive = el.classList.contains('bg-[#c19a6b]');
@@ -321,156 +291,111 @@
                 } else {
                     el.classList.add('bg-[#c19a6b]', 'border-[#c19a6b]');
                     el.classList.remove('border-gray-300');
-                    el.innerHTML = '<span class="text-white text-xs flex items-center justify-center h-full">✓</span>';
+                    el.innerHTML = '<span class="text-white text-[10px] flex items-center justify-center h-full">✓</span>';
                     el.dataset.checked = "true";
                 }
                 saveData();
             });
         });
 
-        // Water Drops
+        // Toggle Water Drops
         document.querySelectorAll('[data-role="water-drop"]').forEach(el => {
             el.addEventListener('click', () => {
                 const isActive = el.classList.contains('bg-blue-400');
                 if(isActive) {
-                    el.classList.remove('bg-blue-400', 'text-white', 'border-blue-400');
-                    el.classList.add('border-blue-300', 'text-blue-300');
+                    el.classList.remove('bg-blue-400', 'border-blue-400');
+                    el.classList.add('border-blue-300');
                     el.dataset.checked = "false";
                 } else {
-                    el.classList.add('bg-blue-400', 'text-white', 'border-blue-400');
-                    el.classList.remove('border-blue-300', 'text-blue-300');
+                    el.classList.add('bg-blue-400', 'border-blue-400');
+                    el.classList.remove('border-blue-300');
                     el.dataset.checked = "true";
                 }
                 saveData();
             });
         });
 
-        // Inputs & Textareas -> Save on type
         document.querySelectorAll('input, textarea, select').forEach(el => {
             el.addEventListener('input', saveData);
         });
     }
 
-    // 2. ระบบบันทึกข้อมูล (LocalStorage)
     function saveData() {
-        // Save Inputs
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            if(el.id) localStorage.setItem('planner_v2_' + el.id, el.value);
+            if(el.id) localStorage.setItem('pv3_' + el.id, el.value);
         });
-        
-        // Save Checkboxes (Index based for simplicity within groups)
-        const circles = document.querySelectorAll('[data-role="check-circle"]');
-        circles.forEach((el, idx) => localStorage.setItem('planner_v2_circle_'+idx, el.dataset.checked));
-
-        const squares = document.querySelectorAll('[data-role="check-square"]');
-        squares.forEach((el, idx) => localStorage.setItem('planner_v2_square_'+idx, el.dataset.checked));
-
-        const water = document.querySelectorAll('[data-role="water-drop"]');
-        water.forEach((el, idx) => localStorage.setItem('planner_v2_water_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv3_sq_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv3_w_'+idx, el.dataset.checked));
     }
 
     function loadData() {
-        // Load Inputs
         document.querySelectorAll('input, textarea, select').forEach(el => {
             if(el.id) {
-                const val = localStorage.getItem('planner_v2_' + el.id);
+                const val = localStorage.getItem('pv3_' + el.id);
                 if(val !== null) el.value = val;
             }
         });
-
-        // Load Circles
-        document.querySelectorAll('[data-role="check-circle"]').forEach((el, idx) => {
-            if(localStorage.getItem('planner_v2_circle_'+idx) === "true") el.click();
-        });
-
-        // Load Squares
         document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
-            if(localStorage.getItem('planner_v2_square_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv3_sq_'+idx) === "true") el.click();
         });
-
-        // Load Water
         document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
-            if(localStorage.getItem('planner_v2_water_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv3_w_'+idx) === "true") el.click();
         });
     }
 
-    // 3. ใส่วันที่อัตโนมัติ
+    // Auto Date
     function setAutoDate() {
-        const dateInput = document.getElementById('date-input');
-        if (dateInput && !dateInput.value) {
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('th-TH', {
-                year: 'numeric', month: '2-digit', day: '2-digit',
-            });
-            dateInput.value = dateStr;
+        const d = document.getElementById('date-input');
+        if(d && !d.value) {
+            d.value = new Date().toLocaleDateString('th-TH', {year:'numeric',month:'2-digit',day:'2-digit'});
             saveData();
         }
     }
 
-    // 4. ปุ่มเริ่มวันใหม่ (Reset)
+    // Reset
     document.getElementById('reset-btn').addEventListener('click', () => {
-        if(confirm('คุณต้องการล้างข้อมูลทั้งหมดเพื่อเริ่มวันใหม่ใช่หรือไม่?')) {
-            Object.keys(localStorage).forEach(key => {
-                if(key.startsWith('planner_v2_')) localStorage.removeItem(key);
-            });
+        if(confirm('เริ่มวันใหม่ (ล้างข้อมูล)?')) {
+            Object.keys(localStorage).forEach(k => { if(k.startsWith('pv3_')) localStorage.removeItem(k); });
             location.reload();
         }
     });
 
-    // 5. บันทึกเป็น PDF (A4 Landscape)
+    // Save PDF (Landscape Fix)
     document.getElementById('save-pdf-btn').addEventListener('click', async () => {
         const { jsPDF } = window.jspdf;
         const area = document.getElementById('planner-card');
-        
-        // จำค่าเดิมไว้
         const originalStyle = area.getAttribute('style');
-        
-        // บังคับขนาดให้เหมือนกับ A4 Landscape (px @ 96dpi approx) เพื่อให้ Grid ทำงาน
-        area.style.width = '1123px'; 
-        area.style.height = '794px';
+
+        // บังคับขนาด Grid ให้พอดี A4 Landscape (Pixel conversion: 297mm approx 1122px)
+        area.style.width = '1122px'; 
+        area.style.height = '793px'; 
         area.style.position = 'fixed';
-        area.style.top = '0';
+        area.style.top = '0'; 
         area.style.left = '0';
-        area.style.zIndex = '-9999';
-        
-        // เพิ่ม Class เพื่อ Trigger CSS @media print (หรือเลียนแบบ Grid)
-        // เนื่องจาก html2canvas อ่าน media print ไม่เก่ง เราจะปล่อยให้ grid ทำงานตาม width ที่กว้างขึ้น
+        area.style.zIndex = '-999';
         
         try {
-            const canvas = await html2canvas(area, {
-                scale: 2, // เพิ่มความชัด
-                useCORS: true,
-                width: 1123,
-                height: 794,
-                windowWidth: 1123,
-                windowHeight: 794
-            });
-
-            // คืนค่าเดิมทันที
-            area.removeAttribute('style'); // ลบ inline style ที่เติมไป
+            const canvas = await html2canvas(area, { scale: 2, width: 1122, height: 793, useCORS: true });
+            area.removeAttribute('style');
             if(originalStyle) area.setAttribute('style', originalStyle);
 
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' = landscape
+            const pdf = new jsPDF('l', 'mm', 'a4');
             pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
-            
-            const dateVal = document.getElementById('date-input').value.replace(/\//g, '-');
-            pdf.save(`Daily_Plan_${dateVal || 'new'}.pdf`);
-
-        } catch (err) {
-            console.error(err);
-            alert('เกิดข้อผิดพลาดในการสร้าง PDF');
+            const dateStr = document.getElementById('date-input').value.replace(/\//g,'-');
+            pdf.save(`Planner_${dateStr}.pdf`);
+        } catch(e) {
+            console.error(e);
             area.removeAttribute('style');
+            alert('Error creating PDF');
         }
     });
 
-    // Init
     window.addEventListener('DOMContentLoaded', () => {
         setupInteractions();
         loadData();
         setAutoDate();
     });
-
   </script>
  </body>
 </html>
