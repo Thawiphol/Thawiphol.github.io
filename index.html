@@ -25,11 +25,63 @@
       outline-offset: 2px;
     }
     
-    /* --- ส่วนที่เพิ่มใหม่: สไตล์สำหรับการพิมพ์ --- */
+    /* --- ส่วนที่แก้ไข: ตั้งค่าหน้ากระดาษ A4 สำหรับการพิมพ์ --- */
     @media print {
-        .no-print { display: none !important; } /* ซ่อนปุ่มตอนปริ้น */
-        .app-wrapper { overflow: visible; }
-        body { background-color: white; }
+        @page {
+            size: A4 portrait; /* บังคับขนาด A4 แนวตั้ง */
+            margin: 10mm;      /* เว้นขอบกระดาษ 10 มม. */
+        }
+        
+        body {
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important; /* สั่งให้พิมพ์สีพื้นหลังออกมาด้วย */
+            print-color-adjust: exact !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .no-print { display: none !important; } /* ซ่อนปุ่ม */
+
+        /* ปรับ Layout ให้เต็มความกว้าง A4 */
+        .app-wrapper { 
+            display: block !important; 
+            overflow: visible !important; 
+            height: auto !important;
+        }
+        
+        #planner-root {
+            padding: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        #planner-card {
+            box-shadow: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            border: 1px solid #ddd !important;
+            border-radius: 0 !important;
+        }
+
+        /* บังคับให้เป็น 2 คอลัมน์เสมอ (ป้องกันไม่ให้มันเรียงเป็นแถวเดียวตอนปริ้น) */
+        .grid {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 1rem !important;
+        }
+
+        /* ย่อขนาดเนื้อหาทั้งหมดลงเล็กน้อยเพื่อให้จบใน 1 หน้า (Scale 85%) */
+        main {
+            transform: scale(0.95);
+            transform-origin: top center;
+            width: 100%;
+        }
+        
+        /* ปรับขนาดตัวอักษร input ให้ชัดเจนเมื่อลงกระดาษ */
+        input, textarea, select {
+            border: 1px solid #ccc !important;
+            background: transparent !important;
+        }
     }
   </style>
   <style>@view-transition { navigation: auto; }</style>
@@ -165,10 +217,8 @@
 
   <script>
     function handleSaveAndPrint() {
-        // 1. สั่งพิมพ์ก่อน (Print Dialog)
         window.print();
 
-        // 2. รวบรวมข้อมูลเพื่อสร้างไฟล์ดาวน์โหลด
         const getVal = (id) => document.getElementById(id)?.value || "";
         
         let content = "=== บันทึกแผนพัฒนาตนเองรายวัน ===\n\n";
@@ -193,7 +243,6 @@
         content += "[สุขภาพร่างกาย]\n";
         content += `ออกกำลังกาย: ${getVal('ex-min')} นาที (${getVal('ex-act')})\n`;
         
-        // นับจำนวนแก้วน้ำที่ Active
         const waterCount = document.querySelectorAll('[data-role="water-unit"][data-active="true"]').length;
         content += `ดื่มน้ำ: ${waterCount} แก้ว\n`;
         content += `การนอน: ${getVal('sleep-hrs')} ชม. (คุณภาพ: ${getVal('sleep-qual')})\n\n`;
@@ -201,7 +250,6 @@
         content += "[การเติบโต / สะท้อนความคิด]\n";
         content += `${getVal('growth-notes')}\n`;
 
-        // 3. สร้างไฟล์และดาวน์โหลด
         const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
         const link = document.createElement("a");
         const dateStr = getVal('date-input').replace(/[\/\s]/g, "-") || "daily-plan";
@@ -215,7 +263,6 @@
   </script>
 
   <script>
-    /* Script เดิมของคุณสำหรับการจัดการสีและ UI (element_sdk) */
     (function () {
       const defaultConfig = {
         background_color: "#fef9f3",
