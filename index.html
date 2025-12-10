@@ -2,7 +2,7 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเอง (Day Counter)</title>
+  <title>แผนพัฒนาตนเองรายวัน (ฉบับสมบูรณ์)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -10,7 +10,7 @@
   <style>
     /* --- ค่าพื้นฐาน --- */
     :root {
-      --primary-color: #b08d55; 
+      --primary-color: #b08d55; /* สีทอง */
       --bg-color: #f0f2f5;
     }
     
@@ -26,18 +26,11 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
 
-    /* ซ่อนปุ่ม Spin ของ Input Number */
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
-    }
-
-    /* --- CSS สำหรับการพิมพ์ --- */
+    /* --- CSS สำหรับการพิมพ์ (หัวใจสำคัญ) --- */
     @media print {
         @page {
-            size: A4 landscape;
-            margin: 0; 
+            size: A4 landscape; /* บังคับกระดาษแนวนอน */
+            margin: 0;          /* ตัดขอบ Browser */
         }
         
         body {
@@ -48,7 +41,8 @@
             print-color-adjust: exact !important;
             width: 297mm;
             height: 210mm;
-            overflow: hidden;
+            overflow: hidden; /* ห้ามมีส่วนเกิน */
+            
             display: flex;
             align-items: center;
             justify-content: center;
@@ -57,9 +51,10 @@
         .no-print { display: none !important; }
 
         #planner-card {
-            /* ปรับขนาดให้พอดีเป๊ะกับ A4 Inkjet (ลดความสูงลงอีกนิดเพื่อความชัวร์) */
+            /* กำหนดขนาดให้ปลอดภัยสำหรับ Printer ทั่วไป (กว้าง 28cm x สูง 18.5cm) */
             width: 280mm !important;
-            height: 180mm !important; 
+            height: 185mm !important; 
+            
             margin: 0 !important;
             padding: 10px 15px !important;
             border: 1px solid #ddd !important;
@@ -69,6 +64,7 @@
             flex-direction: column !important;
         }
 
+        /* ปรับส่วนหัวให้บางลงตอนปริ้น */
         header {
             padding-bottom: 5px !important;
             margin-bottom: 5px !important;
@@ -77,7 +73,7 @@
         
         h1#main-title { font-size: 18pt !important; color: #000 !important; }
         
-        /* Layout Grid */
+        /* Grid Layout */
         #planner-content-grid {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
@@ -86,14 +82,15 @@
             overflow: hidden !important;
         }
 
-        /* ปรับแต่ง Elements ตอนปริ้น */
+        /* ปรับแต่งกล่องข้อความ */
         article { 
             border: 1px solid #999 !important; 
             box-shadow: none !important;
         }
         .shadow-offset { display: none !important; }
-        .p-3 { padding: 4px 8px !important; } /* ลด padding ลง */
+        .p-3 { padding: 5px 8px !important; }
         
+        /* ปรับ Input ให้ดูสะอาดตา */
         input, textarea, select {
             border: 1px solid #bbb !important;
             background-color: #fff !important;
@@ -118,11 +115,11 @@
      
      <header class="w-full pb-3 border-b-2 border-[#b08d55] flex flex-col gap-1 mb-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
-       <div class="flex items-center gap-3">
+       <div class="flex items-center gap-4">
         
-        <div class="relative w-14 h-14 bg-[#b08d55] text-white rounded-lg flex flex-col items-center justify-center shadow-md overflow-hidden group hover:scale-105 transition-transform">
-            <span class="text-[8px] uppercase font-bold opacity-80 mt-1">Day</span>
-            <input id="day-counter" type="number" value="1" class="w-full bg-transparent text-center text-white text-2xl font-bold focus:outline-none focus:bg-[#9a7b4a] h-full pb-2" placeholder="#">
+        <div class="w-24 h-14 bg-white border-2 border-[#b08d55] rounded-lg flex flex-col items-center justify-center overflow-hidden shadow-sm group hover:shadow-md transition-shadow">
+            <label for="day-counter" class="text-[10px] text-[#b08d55] font-bold uppercase tracking-widest mt-1 cursor-pointer">วันที่ทำ (DAY)</label>
+            <input id="day-counter" type="number" class="w-full text-center text-gray-800 text-2xl font-bold focus:outline-none bg-transparent h-full pb-1 placeholder:text-gray-300" placeholder="#">
         </div>
 
         <div class="space-y-0.5">
@@ -180,12 +177,12 @@
           <div class="p-3 flex-1 flex flex-col gap-2 overflow-y-auto">
            <div class="flex flex-col gap-1 h-full">
              <script>
-                // ลดเหลือ 9 บรรทัด เพื่อไม่ให้ล้นหน้า
+                // ลดจำนวนบรรทัดเหลือ 9 บรรทัด เพื่อความปลอดภัยของหน้ากระดาษ
                 for(let i=1; i<=9; i++){
                     document.write(`
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] text-gray-500 w-8 text-right font-mono">${7+i-1}:00</span>
-                        <div class="w-4 h-4 rounded border border-gray-400 cursor-pointer flex items-center justify-center hover:border-[#b08d55] bg-white" data-role="check-square"></div>
+                        <div class="w-4 h-4 rounded border border-gray-400 cursor-pointer flex items-center justify-center hover:border-[#b08d55] bg-white transition-colors" data-role="check-square"></div>
                         <input id="task-${i}" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="">
                     </div>
                     `);
@@ -279,8 +276,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
-    // --- Logic ---
+    // --- Logic การทำงาน ---
+
     function setupInteractions() {
+        // Checkbox สี่เหลี่ยม
         document.querySelectorAll('[data-role="check-square"]').forEach(el => {
             el.addEventListener('click', () => {
                 const isActive = el.classList.contains('bg-[#b08d55]');
@@ -299,6 +298,7 @@
             });
         });
 
+        // Checkbox หยดน้ำ
         document.querySelectorAll('[data-role="water-drop"]').forEach(el => {
             el.addEventListener('click', () => {
                 const isActive = el.classList.contains('bg-blue-400');
@@ -314,35 +314,38 @@
             });
         });
 
-        // Event Listeners for inputs
+        // บันทึกเมื่อพิมพ์ข้อความ
         document.querySelectorAll('input, textarea, select').forEach(el => {
             el.addEventListener('input', saveData);
         });
     }
 
+    // บันทึกลงเครื่อง (LocalStorage)
     function saveData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            if(el.id) localStorage.setItem('pv7_' + el.id, el.value);
+            if(el.id) localStorage.setItem('pv9_' + el.id, el.value);
         });
-        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv7_sq_'+idx, el.dataset.checked));
-        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv7_w_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv9_sq_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv9_w_'+idx, el.dataset.checked));
     }
 
+    // โหลดข้อมูลเดิม
     function loadData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
             if(el.id) {
-                const val = localStorage.getItem('pv7_' + el.id);
+                const val = localStorage.getItem('pv9_' + el.id);
                 if(val !== null) el.value = val;
             }
         });
         document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv7_sq_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv9_sq_'+idx) === "true") el.click();
         });
         document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv7_w_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv9_w_'+idx) === "true") el.click();
         });
     }
 
+    // ใส่วันที่อัตโนมัติ
     function setAutoDate() {
         const d = document.getElementById('date-input');
         if(d && !d.value) {
@@ -351,30 +354,32 @@
         }
     }
 
+    // ปุ่ม Reset
     document.getElementById('reset-btn').addEventListener('click', () => {
-        if(confirm('ล้างข้อมูลเพื่อเริ่มวันใหม่?')) {
-            // เก็บค่า Day Counter ไว้ก่อน
-            const currentDay = document.getElementById('day-counter').value;
-            // ล้างข้อมูลอื่น
+        if(confirm('คุณต้องการล้างข้อมูลเพื่อเริ่มวันใหม่ใช่หรือไม่?')) {
+            // เก็บค่า Day Counter ไว้ (เผื่อไม่อยากลบ)
+            const dayVal = document.getElementById('day-counter').value;
+            
             Object.keys(localStorage).forEach(k => { 
-                if(k.startsWith('pv7_') && k !== 'pv7_day-counter') localStorage.removeItem(k); 
+                if(k.startsWith('pv9_') && k !== 'pv9_day-counter') localStorage.removeItem(k); 
             });
-            // อัปเดต Day Counter + 1 ให้อัตโนมัติ (Option เสริม)
-            if(currentDay && !isNaN(currentDay)) {
-                localStorage.setItem('pv7_day-counter', parseInt(currentDay) + 1);
-            }
+            
+            // ถ้าอยากให้นับวันเพิ่มอัตโนมัติ ให้เปิดบรรทัดล่างนี้
+            // if(dayVal) localStorage.setItem('pv9_day-counter', parseInt(dayVal)+1);
+
             location.reload();
         }
     });
 
+    // ปุ่ม Save PDF
     document.getElementById('save-pdf-btn').addEventListener('click', async () => {
         const { jsPDF } = window.jspdf;
         const area = document.getElementById('planner-card');
         const originalStyle = area.getAttribute('style');
 
-        // Fix size for Inkjet Safety (1058x680px)
+        // บังคับขนาด Render ให้ปลอดภัยสำหรับ A4 (1058px x 680px)
         area.style.width = '1058px'; 
-        area.style.height = '680px'; // ลดความสูงลงอีกนิดให้ปลอดภัยสุดๆ
+        area.style.height = '680px'; 
         area.style.position = 'fixed';
         area.style.top = '0'; 
         area.style.left = '0';
@@ -387,13 +392,12 @@
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('l', 'mm', 'a4');
-            
-            // วางภาพโดยเว้นขอบเซฟตี้ 5mm
+            // วางภาพเว้นระยะ 5mm
             pdf.addImage(imgData, 'PNG', 5, 5, 280, 180);
             
             const dateStr = document.getElementById('date-input').value.replace(/\//g,'-');
-            const dayCount = document.getElementById('day-counter').value;
-            pdf.save(`Planner_Day${dayCount}_${dateStr}.pdf`);
+            const dayCount = document.getElementById('day-counter').value || 'Plan';
+            pdf.save(`Day${dayCount}_${dateStr}.pdf`);
         } catch(e) {
             console.error(e);
             area.removeAttribute('style');
