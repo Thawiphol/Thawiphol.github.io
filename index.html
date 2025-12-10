@@ -2,15 +2,15 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเอง (ฉบับสมบูรณ์ - ภาษาไทย)</title>
+  <title>แผนพัฒนาตนเอง (ภาษาไทย 100% - จบในแผ่นเดียว)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
-    /* --- ตั้งค่าพื้นฐาน --- */
+    /* --- ค่าพื้นฐาน --- */
     :root {
-      --primary-color: #b08d55; /* ปรับสีทองให้เข้มขึ้นเล็กน้อยเพื่อให้ดูต่าง */
+      --primary-color: #b08d55; 
       --bg-color: #f0f2f5;
     }
     
@@ -26,11 +26,11 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
 
-    /* --- CSS สำหรับการพิมพ์ (หัวใจสำคัญ) --- */
+    /* --- CSS สำหรับการพิมพ์ (ปรับใหม่ให้ปลอดภัยกับ Canon G-Series) --- */
     @media print {
         @page {
-            size: A4 landscape; /* บังคับแนวนอน */
-            margin: 0;          /* ตัดขอบ Browser */
+            size: A4 landscape;
+            margin: 0; /* สั่ง Browser ตัดขอบ แต่ Printer Driver จะยังมีขอบขาวอยู่ */
         }
         
         body {
@@ -41,13 +41,9 @@
             print-color-adjust: exact !important;
             width: 297mm;
             height: 210mm;
-            overflow: hidden; /* ห้ามมีส่วนเกิน */
+            overflow: hidden;
             
-            /* --- เทคนิคบังคับจบในหน้าเดียว --- */
-            /* ย่อทุกอย่างลงเหลือ 98% เพื่อเผื่อขอบ Printer */
-            transform: scale(0.98); 
-            transform-origin: center center;
-            
+            /* จัดกึ่งกลาง */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -56,50 +52,65 @@
         .no-print { display: none !important; }
 
         #planner-card {
-            width: 290mm !important;
-            height: 200mm !important;
+            /* ลดขนาดลงเพื่อให้ปลอดภัยกับขอบขาวของเครื่องปริ้น Inkjet */
+            width: 280mm !important;
+            height: 185mm !important; /* ลดความสูงเหลือ 18.5cm (ปลอดภัยชัวร์) */
+            
             margin: 0 !important;
             padding: 10px 15px !important;
-            border: none !important;
+            border: 1px solid #ddd !important;
             box-shadow: none !important;
             border-radius: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
         }
 
-        /* ปรับ Header ตอนปริ้นให้กะทัดรัด */
+        /* ปรับส่วนหัวให้เล็กลง */
         header {
             padding-bottom: 5px !important;
             margin-bottom: 5px !important;
             border-bottom: 2px solid #ddd !important;
         }
         
-        h1#main-title { font-size: 20pt !important; color: #000 !important; }
+        h1#main-title { font-size: 18pt !important; color: #000 !important; }
+        p#subtitle-text { font-size: 10pt !important; }
         
-        /* Grid Layout สำหรับปริ้น */
+        /* Grid Layout */
         #planner-content-grid {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 12px !important;
-            height: auto !important;
+            gap: 10px !important;
+            flex: 1;
+            overflow: hidden !important;
         }
 
         /* ปรับแต่งกล่องข้อความ */
         article { 
-            border: 1px solid #888 !important; /* เส้นขอบชัดขึ้นตอนปริ้น */
+            border: 1px solid #999 !important; 
             box-shadow: none !important;
         }
         .shadow-offset { display: none !important; }
         
-        /* ลดระยะห่างภายใน */
-        .p-3 { padding: 6px 10px !important; }
+        /* ลด Padding ให้เนื้อหาแน่นขึ้น */
+        .p-3 { padding: 5px 8px !important; }
         
+        /* ปรับ Input */
         input, textarea, select {
             border: 1px solid #bbb !important;
             background-color: #fff !important;
-            font-size: 10pt !important;
+            font-size: 9pt !important;
+            padding: 2px 4px !important;
         }
 
-        /* ซ่อน Scrollbar ตอนปริ้น */
+        /* ซ่อน Scrollbar */
         .overflow-y-auto { overflow: hidden !important; }
+        
+        /* Footer */
+        footer {
+            margin-top: 5px !important;
+            padding-top: 5px !important;
+            font-size: 9pt !important;
+        }
     }
   </style>
  </head>
@@ -116,11 +127,11 @@
         <div class="w-10 h-10 bg-[#b08d55] text-white rounded-lg flex items-center justify-center text-xl font-bold">D</div>
         <div class="space-y-0.5">
             <h1 id="main-title" class="font-bold tracking-wide text-2xl text-gray-800 uppercase">แผนพัฒนาตนเองรายวัน</h1>
-            <p class="text-sm text-[#b08d55] font-medium">Daily Self-Development Planner</p>
+            <p id="subtitle-text" class="text-sm text-[#b08d55] font-medium">Daily Self-Development Planner</p>
         </div>
        </div>
        <div class="flex flex-col items-end gap-1">
-        <label for="date-input" class="text-xs text-gray-500 font-bold uppercase">วันที่ / Date</label> 
+        <label for="date-input" class="text-xs text-gray-500 font-bold uppercase">วันที่ / DATE</label> 
         <input id="date-input" type="text" placeholder="วว / ดด / ปปปป" class="focus-ring rounded px-3 py-1.5 text-sm border-2 border-gray-200 bg-gray-50 text-right w-44 font-semibold text-gray-700">
        </div>
       </div>
@@ -131,7 +142,7 @@
        
        <section class="flex flex-col gap-3 h-full">
         
-        <div class="grid grid-cols-2 gap-3 h-[170px]">
+        <div class="grid grid-cols-2 gap-3 h-[160px]">
             <article class="relative group h-full">
              <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded bg-gray-200"></div>
              <div class="relative rounded border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
@@ -169,7 +180,7 @@
           <div class="p-3 flex-1 flex flex-col gap-2 overflow-y-auto">
            <div class="flex flex-col gap-1 h-full">
              <script>
-                // ลดเหลือ 9 บรรทัดเพื่อให้มั่นใจว่าไม่ล้น
+                // ปรับเหลือ 9 บรรทัด เพื่อความปลอดภัยของความสูง
                 for(let i=1; i<=9; i++){
                     document.write(`
                     <div class="flex items-center gap-2">
@@ -188,7 +199,7 @@
 
        <section class="flex flex-col gap-3 h-full">
         
-        <article class="relative group h-[170px]">
+        <article class="relative group h-[160px]">
          <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded bg-gray-200"></div>
          <div class="relative rounded border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
           <div class="px-3 py-1.5 bg-[#b08d55] text-white flex items-center gap-2">
@@ -221,7 +232,7 @@
             <span class="text-xs text-gray-400">|</span>
             <span class="text-xs text-gray-500">คุณภาพ:</span>
             <select id="sleep-qual" class="focus-ring rounded border-gray-300 px-1 py-1 text-xs bg-gray-50">
-                <option>-</option><option>ดีเยี่ยม</option><option>ดี</option><option>พอใช้</option><option>ควรปรับปรุง</option>
+                <option>-</option><option>ดีเยี่ยม</option><option>ดี</option><option>พอใช้</option><option>แย่</option>
             </select>
            </div>
           </div>
@@ -310,24 +321,24 @@
 
     function saveData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            if(el.id) localStorage.setItem('pv5_' + el.id, el.value);
+            if(el.id) localStorage.setItem('pv6_' + el.id, el.value);
         });
-        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv5_sq_'+idx, el.dataset.checked));
-        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv5_w_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv6_sq_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv6_w_'+idx, el.dataset.checked));
     }
 
     function loadData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
             if(el.id) {
-                const val = localStorage.getItem('pv5_' + el.id);
+                const val = localStorage.getItem('pv6_' + el.id);
                 if(val !== null) el.value = val;
             }
         });
         document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv5_sq_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv6_sq_'+idx) === "true") el.click();
         });
         document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv5_w_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv6_w_'+idx) === "true") el.click();
         });
     }
 
@@ -341,7 +352,7 @@
 
     document.getElementById('reset-btn').addEventListener('click', () => {
         if(confirm('ล้างข้อมูลเริ่มวันใหม่?')) {
-            Object.keys(localStorage).forEach(k => { if(k.startsWith('pv5_')) localStorage.removeItem(k); });
+            Object.keys(localStorage).forEach(k => { if(k.startsWith('pv6_')) localStorage.removeItem(k); });
             location.reload();
         }
     });
@@ -351,26 +362,26 @@
         const area = document.getElementById('planner-card');
         const originalStyle = area.getAttribute('style');
 
-        // บังคับขนาดให้เป๊ะตามสัดส่วน A4 (ลดลงนิดนึงกันขอบ)
-        area.style.width = '1080px'; 
-        area.style.height = '740px'; 
+        // บังคับขนาดให้ปลอดภัยสำหรับ A4 Inkjet (1058x700 px โดยประมาณ)
+        area.style.width = '1058px'; 
+        area.style.height = '700px'; 
         area.style.position = 'fixed';
         area.style.top = '0'; 
         area.style.left = '0';
         area.style.zIndex = '-999';
         
         try {
-            const canvas = await html2canvas(area, { scale: 2, width: 1080, height: 740, useCORS: true });
+            const canvas = await html2canvas(area, { scale: 2, width: 1058, height: 700, useCORS: true });
             area.removeAttribute('style');
             if(originalStyle) area.setAttribute('style', originalStyle);
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('l', 'mm', 'a4');
-            // วางกึ่งกลาง A4
-            pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
+            // วางภาพโดยเว้นขอบเซฟตี้ 5mm
+            pdf.addImage(imgData, 'PNG', 5, 5, 280, 185);
             
             const dateStr = document.getElementById('date-input').value.replace(/\//g,'-');
-            pdf.save(`Planner_Final_${dateStr}.pdf`);
+            pdf.save(`Planner_Safe_Thai_${dateStr}.pdf`);
         } catch(e) {
             console.error(e);
             area.removeAttribute('style');
