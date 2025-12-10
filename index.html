@@ -2,7 +2,7 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเองรายวัน (V.10 - ห้ามติดลบ)</title>
+  <title>แผนพัฒนาตนเอง (V.11 - ล็อกห้ามติดลบ 100%)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +26,7 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
 
-    /* ซ่อนปุ่มลูกศรขึ้นลงใน Input Number (เพื่อให้ดูคลีน) */
+    /* ซ่อนปุ่มลูกศรขึ้นลงใน Input Number */
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { 
       -webkit-appearance: none; 
@@ -118,7 +118,15 @@
         
         <div class="w-24 h-14 bg-white border-2 border-[#b08d55] rounded-lg flex flex-col items-center justify-center overflow-hidden shadow-sm group hover:shadow-md transition-shadow">
             <label for="day-counter" class="text-[10px] text-[#b08d55] font-bold uppercase tracking-widest mt-1 cursor-pointer">วันที่ทำ (DAY)</label>
-            <input id="day-counter" type="number" min="0" oninput="validity.valid||(value=''); if(value<0) value=0;" class="w-full text-center text-gray-800 text-2xl font-bold focus:outline-none bg-transparent h-full pb-1 placeholder:text-gray-300" placeholder="0">
+            
+            <input 
+                id="day-counter" 
+                type="number" 
+                min="0" 
+                onkeydown="if(['-','+','e','E'].includes(event.key)) event.preventDefault()"
+                oninput="if(this.value < 0) this.value = 0;"
+                class="w-full text-center text-gray-800 text-2xl font-bold focus:outline-none bg-transparent h-full pb-1 placeholder:text-gray-300" 
+                placeholder="0">
         </div>
 
         <div class="space-y-0.5">
@@ -315,24 +323,24 @@
 
     function saveData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            if(el.id) localStorage.setItem('pv10_' + el.id, el.value);
+            if(el.id) localStorage.setItem('pv11_' + el.id, el.value);
         });
-        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv10_sq_'+idx, el.dataset.checked));
-        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv10_w_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv11_sq_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv11_w_'+idx, el.dataset.checked));
     }
 
     function loadData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
             if(el.id) {
-                const val = localStorage.getItem('pv10_' + el.id);
+                const val = localStorage.getItem('pv11_' + el.id);
                 if(val !== null) el.value = val;
             }
         });
         document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv10_sq_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv11_sq_'+idx) === "true") el.click();
         });
         document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv10_w_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv11_w_'+idx) === "true") el.click();
         });
     }
 
@@ -348,7 +356,7 @@
         if(confirm('ล้างข้อมูลเริ่มวันใหม่? (ค่า DAY จะยังอยู่)')) {
             const dayVal = document.getElementById('day-counter').value;
             Object.keys(localStorage).forEach(k => { 
-                if(k.startsWith('pv10_') && k !== 'pv10_day-counter') localStorage.removeItem(k); 
+                if(k.startsWith('pv11_') && k !== 'pv11_day-counter') localStorage.removeItem(k); 
             });
             location.reload();
         }
