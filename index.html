@@ -2,26 +2,41 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเองรายวัน</title>
+  <title>แผนพัฒนาตนเองรายวัน (A4 แนวนอน)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="/_sdk/element_sdk.js"></script>
+  
   <style>
+    :root {
+      --primary-color: #c19a6b;
+      --bg-color: #fef9f3;
+      --border-color: #e0e0e0;
+    }
+    
     body {
       box-sizing: border-box;
-      font-family: 'Sarabun', sans-serif; /* แนะนำให้หา Font ภาษาไทยสวยๆ มาใส่ถ้าต้องการ */
+      font-family: 'Sarabun', sans-serif;
+      background-color: #f3f4f6; /* สีพื้นหลังเว็บ */
     }
+
     /* Custom scrollbars */
     .app-wrapper::-webkit-scrollbar { width: 8px; }
     .app-wrapper::-webkit-scrollbar-track { background: transparent; }
     .app-wrapper::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
-    .focus-ring:focus-visible { outline: 2px solid #c19a6b; outline-offset: 2px; }
-    
-    /* --- CSS สำหรับการพิมพ์ (Print / Save as PDF) --- */
+    .focus-ring:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+    /* --- CSS สำหรับหน้าจอปกติ (Screen) --- */
+    #planner-card {
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    /* --- CSS สำหรับการพิมพ์ (Print / PDF) - หัวใจสำคัญของ A4 แนวนอน --- */
     @media print {
         @page {
-            size: A4 portrait;
-            margin: 0; /* ตัดขอบ Default ของ Browser ทิ้งเพื่อให้เราจัดเอง */
+            size: A4 landscape; /* บังคับแนวนอน */
+            margin: 0; 
         }
         
         body {
@@ -30,514 +45,432 @@
             background-color: white !important;
             -webkit-print-color-adjust: exact !important; 
             print-color-adjust: exact !important;
+            width: 297mm;
+            height: 210mm;
+            overflow: hidden; /* ห้ามมี Scrollbar */
         }
 
-        .no-print { display: none !important; } /* ซ่อนปุ่ม */
+        .no-print { display: none !important; } /* ซ่อนปุ่มต่างๆ */
 
-        /* ปรับ Container หลักให้ยืดเต็มจอ */
         .app-wrapper, #planner-root {
             display: block !important;
-            position: relative !important;
             width: 100% !important;
-            height: auto !important;
+            height: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
             overflow: visible !important;
+            background-color: white !important;
         }
 
-        /* ปรับการ์ดให้เต็มหน้า A4 พอดี */
         #planner-card {
-            width: 210mm !important; /* ความกว้าง A4 */
-            min-height: 295mm !important; /* ความสูง A4 โดยประมาณ */
+            width: 297mm !important;
+            height: 210mm !important;
             max-width: none !important;
-            margin: 0 auto !important;
-            padding: 10mm 15mm !important; /* เว้นขอบสวยงาม ซ้าย-ขวา 1.5cm */
+            margin: 0 !important;
+            padding: 8mm 12mm !important; /* เว้นขอบซ้ายขวา */
             border: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
+            display: flex !important;
+            flex-direction: column;
         }
 
-        /* บังคับ Layout 2 คอลัมน์ */
-        .grid {
+        /* จัด Layout ใหม่เป็น 3 คอลัมน์ด้วย Grid */
+        #planner-content-grid {
             display: grid !important;
-            grid-template-columns: 1fr 1fr !important; /* บังคับแบ่งครึ่ง */
-            gap: 1.5rem !important;
+            grid-template-columns: 1fr 1.2fr 1fr !important; /* แบ่ง 3 ส่วน (กลางกว้างหน่อย) */
+            grid-template-rows: auto 1fr !important; 
+            gap: 1rem !important;
+            height: 100% !important;
+            align-content: stretch;
         }
 
-        /* ปรับขนาดตัวอักษรให้ใหญ่อ่านง่ายเมื่อลงกระดาษ */
-        * {
-            font-size: 12pt !important; /* ขนาดมาตรฐานเอกสาร */
+        /* ใช้ display: contents เพื่อให้ลูกๆ ของ section มารวมอยู่ใน grid หลัก */
+        .section-wrapper {
+            display: contents !important;
         }
-        h1#main-title { font-size: 24pt !important; }
-        h2 { font-size: 14pt !important; padding: 5px !important; }
+
+        /* --- จัดตำแหน่งกล่องต่างๆ ใน Grid 3 คอลัมน์ --- */
         
-        /* เส้นขอบ Input ให้ชัดขึ้น */
-        input, textarea, select {
-            border: 1px solid #aaa !important;
-        }
+        /* คอลัมน์ 1: ซ้าย */
+        #article-mindset { grid-column: 1; grid-row: 1; }
+        #article-focus { grid-column: 1; grid-row: 2; height: auto !important; }
+
+        /* คอลัมน์ 2: กลาง (ยาวตลอดแนว) */
+        #article-tasks { grid-column: 2; grid-row: 1 / span 2; height: 100% !important; }
+
+        /* คอลัมน์ 3: ขวา */
+        #article-health { grid-column: 3; grid-row: 1; }
+        #article-growth { grid-column: 3; grid-row: 2; height: auto !important; }
+
+        /* ปรับขนาดฟอนต์สำหรับการพิมพ์ */
+        * { font-size: 10pt !important; }
+        h1#main-title { font-size: 20pt !important; }
+        h2 { font-size: 11pt !important; }
+        textarea { resize: none !important; }
+        
+        /* ซ่อนเงา (Shadow divs) ตอนพิมพ์เพื่อให้สะอาดตา */
+        .shadow-offset { display: none !important; }
+        .card-container { border: 1px solid #ccc !important; }
     }
   </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full w-full m-0 p-0 relative">
   
-  <div id="app-root" class="app-wrapper h-full w-full overflow-auto flex items-center justify-center">
-   <div id="planner-root" class="w-full h-full flex items-center justify-center px-4 py-4">
-    <main id="planner-card" class="w-full max-w-5xl h-full rounded-2xl shadow-lg flex flex-col">
-     <header class="w-full px-8 pt-6 pb-3 border-b flex flex-col gap-3" aria-label="ส่วนหัวแผน">
+  <div id="app-root" class="app-wrapper h-full w-full overflow-auto flex items-center justify-center p-4">
+   <div id="planner-root" class="w-full flex items-center justify-center">
+    <main id="planner-card" class="w-full max-w-5xl rounded-2xl shadow-xl flex flex-col bg-white min-h-[800px]">
+     
+     <header class="w-full px-8 pt-6 pb-4 border-b flex flex-col gap-2">
       <div class="flex flex-wrap items-center justify-between gap-4">
        <div class="space-y-1">
-        <h1 id="main-title" class="font-bold tracking-wide uppercase">โปรแกรมพัฒนาตนเองรายวัน</h1>
-        <p id="subtitle-text" class="text-sm opacity-80">สร้างนิสัยดี ฝึกจิตใจ เสริมสร้างร่างกาย</p>
+        <h1 id="main-title" class="font-bold tracking-wide text-2xl text-gray-800 uppercase">โปรแกรมพัฒนาตนเองรายวัน</h1>
+        <p id="subtitle-text" class="text-sm text-gray-500">สร้างนิสัยดี ฝึกจิตใจ เสริมสร้างร่างกาย</p>
        </div>
-       <div class="flex flex-col items-end gap-2"><label for="date-input" class="text-xs opacity-80">วันที่</label> 
-        <input id="date-input" type="text" aria-label="วันที่" placeholder="DD / MM / YYYY" class="focus-ring rounded-md px-3 py-1.5 text-xs border bg-transparent placeholder:opacity-60">
+       <div class="flex flex-col items-end gap-1">
+        <label for="date-input" class="text-xs text-gray-500 font-semibold">DATE</label> 
+        <input id="date-input" type="text" placeholder="DD / MM / YYYY" class="focus-ring rounded-md px-3 py-1.5 text-sm border bg-gray-50 text-right w-40 font-medium">
        </div>
       </div>
      </header>
-     <section class="flex-1 w-full px-6 pb-6 pt-3">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 h-full">
-       <section aria-label="จิตใจและการวางแผน" class="flex flex-col gap-4">
-        <article class="relative rounded-xl shadow-sm" aria-label="ส่วนจิตใจยามเช้า">
-         <div class="absolute inset-0 translate-x-[2px] translate-y-[2px] rounded-xl opacity-80 pointer-events-none" id="mm-shadow"></div>
-         <div class="relative rounded-xl border h-full flex flex-col overflow-hidden" id="mm-card">
-          <div class="px-4 py-2.5 flex items-center gap-2" id="mm-title-bar"><span aria-hidden="true">☀️</span>
-           <h2 id="mm-title" class="text-xs font-semibold tracking-wide uppercase">จิตใจยามเช้า</h2>
+
+     <section class="flex-1 w-full px-6 py-6">
+      <div id="planner-content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+       
+       <section class="section-wrapper flex flex-col gap-5">
+        
+        <article id="article-mindset" class="relative group">
+         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200 transition-transform"></div>
+         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>☀️</span><h2 class="text-sm font-bold uppercase tracking-wider">จิตใจยามเช้า</h2>
           </div>
-          <div class="px-4 pb-3 pt-3 flex-1 flex flex-col gap-2"><label for="gratitude-1" id="mm-prompt" class="text-xs mb-1"> วันนี้ฉันขอบคุณสำหรับ: </label> <textarea id="gratitude-1" class="focus-ring w-full rounded-md border px-2.5 py-1.5 text-xs resize-none" rows="2"></textarea> <textarea id="gratitude-2" class="focus-ring w-full rounded-md border px-2.5 py-1.5 text-xs resize-none" rows="2"></textarea>
-          </div>
-         </div>
-        </article>
-        <article class="relative rounded-xl shadow-sm" aria-label="ส่วนสิ่งสำคัญ 3 อันดับ">
-         <div class="absolute inset-0 translate-x-[2px] translate-y-[2px] rounded-xl opacity-80 pointer-events-none" id="lf-shadow"></div>
-         <div class="relative rounded-xl border h-full flex flex-col overflow-hidden" id="lf-card">
-          <div class="px-4 py-2.5 flex items-center gap-2" id="lf-title-bar"><span aria-hidden="true">🎯</span>
-           <h2 id="lf-title" class="text-xs font-semibold tracking-wide uppercase">สิ่งสำคัญ 3 อันดับแรก</h2>
-          </div>
-          <div class="px-4 pb-3 pt-3 flex-1 flex flex-col gap-2">
-           <ol class="space-y-2 text-xs">
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center" data-role="circle-checkbox" aria-label="เลือกสิ่งสำคัญ 1"></button> <input type="text" id="prio-1" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="สิ่งสำคัญอันดับ 1"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center" data-role="circle-checkbox" aria-label="เลือกสิ่งสำคัญ 2"></button> <input type="text" id="prio-2" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="สิ่งสำคัญอันดับ 2"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded-full border flex-shrink-0 flex items-center justify-center" data-role="circle-checkbox" aria-label="เลือกสิ่งสำคัญ 3"></button> <input type="text" id="prio-3" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="สิ่งสำคัญอันดับ 3"></li>
-           </ol>
+          <div class="p-4 flex-1 flex flex-col gap-2">
+            <label class="text-xs font-semibold text-gray-600">วันนี้ฉันขอบคุณสำหรับ:</label> 
+            <textarea id="gratitude-1" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-xs resize-none h-14" placeholder="1..."></textarea> 
+            <textarea id="gratitude-2" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-xs resize-none h-14" placeholder="2..."></textarea>
           </div>
          </div>
         </article>
-        <article class="relative rounded-xl shadow-sm flex-1" aria-label="ส่วนรายการงานและตารางเวลา">
-         <div class="absolute inset-0 translate-x-[2px] translate-y-[2px] rounded-xl opacity-80 pointer-events-none" id="tl-shadow"></div>
-         <div class="relative rounded-xl border h-full flex flex-col overflow-hidden" id="tl-card">
-          <div class="px-4 py-2.5 flex items-center gap-2" id="tl-title-bar"><span aria-hidden="true">📝</span>
-           <h2 id="tl-title" class="text-xs font-semibold tracking-wide uppercase">รายการงาน / ตารางเวลา</h2>
+
+        <article id="article-focus" class="relative group">
+         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
+         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>🎯</span><h2 class="text-sm font-bold uppercase tracking-wider">สิ่งสำคัญ 3 อันดับแรก</h2>
           </div>
-          <div class="px-4 pb-3 pt-3 flex-1 flex flex-col gap-1.5">
-           <ul class="space-y-1.5 text-xs">
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-1" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 1 / ช่วงเวลา"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-2" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 2 / ช่วงเวลา"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-3" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 3 / ช่วงเวลา"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-4" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 4 / ช่วงเวลา"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-5" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 5 / ช่วงเวลา"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-6" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 6 / ช่วงเวลา"></li>
-            <li class="flex items-center gap-2"><button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> <input type="text" id="task-7" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="งาน 7 / ช่วงเวลา"></li>
+          <div class="p-4 flex-1">
+           <ul class="space-y-3">
+            <li class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-[#c19a6b]" data-role="check-circle"></div> 
+                <input id="prio-1" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-sm bg-gray-50" placeholder="สำคัญที่สุด">
+            </li>
+            <li class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-[#c19a6b]" data-role="check-circle"></div> 
+                <input id="prio-2" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-sm bg-gray-50" placeholder="รองลงมา">
+            </li>
+            <li class="flex items-center gap-2">
+                <div class="w-5 h-5 rounded-full border-2 border-gray-300 cursor-pointer hover:border-[#c19a6b]" data-role="check-circle"></div> 
+                <input id="prio-3" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-sm bg-gray-50" placeholder="รองลงมา">
+            </li>
            </ul>
           </div>
          </div>
         </article>
-       </section>
-       <section aria-label="ร่างกายและการเติบโต" class="flex flex-col gap-4">
-        <article class="relative rounded-xl shadow-sm" aria-label="ส่วนสุขภาพร่างกาย">
-         <div class="absolute inset-0 translate-x-[2px] translate-y-[2px] rounded-xl opacity-80 pointer-events-none" id="ph-shadow"></div>
-         <div class="relative rounded-xl border h-full flex flex-col overflow-hidden" id="ph-card">
-          <div class="px-4 py-2.5 flex items-center gap-2" id="ph-title-bar"><span aria-hidden="true">💪</span>
-           <h2 id="ph-title" class="text-xs font-semibold tracking-wide uppercase">สุขภาพร่างกาย</h2>
+
+        <article id="article-tasks" class="relative group flex-1">
+         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
+         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>📝</span><h2 class="text-sm font-bold uppercase tracking-wider">ตารางเวลา / งาน</h2>
           </div>
-          <div class="px-4 pb-3 pt-3 flex-1 flex flex-col gap-3 text-xs">
-           <div class="flex items-center gap-2">
-               <span class="font-semibold">ออกกำลังกาย</span> 
-               <button type="button" class="focus-ring w-4 h-4 rounded border flex-shrink-0 flex items-center justify-center" data-role="square-checkbox"></button> 
-               <input type="text" id="ex-min" class="focus-ring w-14 rounded-md border px-2 py-1 text-xs" placeholder="นาที"> 
-               <span>กิจกรรม</span> 
-               <input type="text" id="ex-act" class="focus-ring flex-1 rounded-md border px-2 py-1 text-xs" placeholder="เช่น วิ่ง ยกน้ำหนัก">
+          <div class="p-4 flex-1 flex flex-col gap-2 overflow-hidden">
+           <div class="flex flex-col gap-2 h-full">
+             <script>
+                for(let i=1; i<=10; i++){
+                    document.write(`
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-gray-400 w-8 text-right">${8+i-1}:00</span>
+                        <div class="w-4 h-4 rounded border border-gray-300 cursor-pointer flex items-center justify-center hover:border-[#c19a6b]" data-role="check-square"></div>
+                        <input id="task-${i}" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="">
+                    </div>
+                    `);
+                }
+             </script>
            </div>
-           <div class="flex flex-col gap-1.5"><span class="text-xs font-semibold">ดื่มน้ำ</span>
-            <div class="flex flex-wrap gap-1.5 items-center" aria-label="การดื่มน้ำ">
-             <div class="flex gap-1.5">
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button> 
-                <button type="button" class="focus-ring w-5 h-5 rounded-full border flex items-center justify-center text-[10px]" data-role="water-unit"></button>
-             </div>
+          </div>
+         </div>
+        </article>
+       </section>
+
+       <section class="section-wrapper flex flex-col gap-5">
+        
+        <article id="article-health" class="relative group">
+         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
+         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>💪</span><h2 class="text-sm font-bold uppercase tracking-wider">สุขภาพร่างกาย</h2>
+          </div>
+          <div class="p-4 flex-1 flex flex-col gap-4 text-sm">
+           
+           <div class="flex items-center gap-2 flex-wrap">
+               <span class="font-semibold text-gray-700 w-16">Exercise:</span>
+               <div class="w-4 h-4 rounded border border-gray-300 cursor-pointer" data-role="check-square"></div>
+               <input id="ex-min" type="text" class="focus-ring w-16 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="นาที">
+               <input id="ex-type" type="text" class="focus-ring flex-1 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="กิจกรรม">
+           </div>
+
+           <div class="flex flex-col gap-1">
+            <span class="font-semibold text-gray-700">Water Intake:</span>
+            <div class="flex gap-2 mt-1">
+                <script>
+                    for(let i=0; i<8; i++){
+                        document.write(`<div class="w-6 h-6 rounded-full border border-blue-300 cursor-pointer flex items-center justify-center text-[10px] text-blue-300 hover:bg-blue-50" data-role="water-drop">💧</div>`);
+                    }
+                </script>
             </div>
            </div>
-           <div class="flex flex-wrap items-center gap-2"><span class="text-xs font-semibold">การนอนหลับ</span> 
-            <input type="text" id="sleep-hrs" class="focus-ring w-14 rounded-md border px-2 py-1 text-xs" placeholder="ชม."> 
-            <span class="text-xs opacity-80">คุณภาพ</span> 
-            <select id="sleep-qual" class="focus-ring rounded-md border px-2 py-1 text-xs"> <option>ดีมาก</option> <option>ดี</option> <option>พอใช้</option> <option>แย่</option> </select>
+
+           <div class="flex items-center gap-2 pt-1">
+            <span class="font-semibold text-gray-700 w-16">Sleep:</span>
+            <input id="sleep-hrs" type="text" class="focus-ring w-16 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="ชั่วโมง">
+            <span class="text-xs text-gray-500">Quality:</span>
+            <select id="sleep-qual" class="focus-ring rounded border-gray-300 px-1 py-1 text-xs bg-gray-50">
+                <option>-</option><option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option>
+            </select>
            </div>
           </div>
          </div>
         </article>
-        <article class="relative rounded-xl shadow-sm flex-1" aria-label="ส่วนการเติบโตและสะท้อนความคิด">
-         <div class="absolute inset-0 translate-x-[2px] translate-y-[2px] rounded-xl opacity-80 pointer-events-none" id="gr-shadow"></div>
-         <div class="relative rounded-xl border h-full flex flex-col overflow-hidden" id="gr-card">
-          <div class="px-4 py-2.5 flex items-center gap-2" id="gr-title-bar"><span aria-hidden="true">📓</span>
-           <h2 id="gr-title" class="text-xs font-semibold tracking-wide uppercase">การเติบโต / สะท้อนความคิด</h2>
+
+        <article id="article-growth" class="relative group flex-1">
+         <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
+         <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
+          <div class="px-4 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
+           <span>📓</span><h2 class="text-sm font-bold uppercase tracking-wider">การเติบโต / สะท้อนความคิด</h2>
           </div>
-          <div class="px-4 pb-3 pt-3 flex-1 flex flex-col gap-2 text-xs"><label for="growth-notes" id="gr-prompt" class="text-xs opacity-90"> ชิงชัย บทเรียน การเปลี่ยนแปลงความคิด: </label> <textarea id="growth-notes" class="focus-ring w-full h-full rounded-md border px-2.5 py-1.5 text-xs resize-none"></textarea>
+          <div class="p-4 flex-1 flex flex-col gap-2 h-full">
+            <label class="text-xs text-gray-500">บทเรียนวันนี้, ไอเดียใหม่, หรือสิ่งที่ต้องปรับปรุง:</label>
+            <textarea id="growth-notes" class="focus-ring w-full flex-1 min-h-[120px] rounded border-gray-300 bg-gray-50 px-3 py-2 text-sm resize-none"></textarea>
           </div>
          </div>
         </article>
+
        </section>
       </div>
      </section>
-     <footer class="w-full px-8 py-3 border-t text-[11px] flex items-center justify-between gap-4">
-      <p id="footer-note" class="opacity-80">ก้าวเล็กๆ ทุกวันนำไปสู่การเปลี่ยนแปลงครั้งใหญ่</p>
-      <p class="opacity-60 text-right">ออกแบบเพื่อการพัฒนาตนเองของคุณ</p>
+
+     <footer class="w-full px-8 py-4 border-t text-[10px] flex items-center justify-between text-gray-400">
+      <p>"ก้าวเล็กๆ ทุกวัน นำไปสู่ความสำเร็จที่ยิ่งใหญ่"</p>
+      <p>Daily Planner - ออกแบบเพื่อการพัฒนาตนเอง</p>
      </footer>
     </main>
    </div>
   </div>
 
-  <div class="fixed bottom-6 right-6 no-print z-50">
-    <button id="print-btn" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-6 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
-        <span style="font-size: 1.2em;">📄</span> พิมพ์
+  <div class="fixed bottom-6 right-6 no-print z-50 flex flex-col gap-3">
+    <button id="reset-btn" class="bg-red-500 hover:bg-red-600 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
+        <span>🔄</span> <span class="text-sm">เริ่มวันใหม่</span>
     </button>
-    <!-- Save PDF button will be added dynamically to keep original file structure untouched -->
+    
+    <button id="save-pdf-btn" class="bg-green-600 hover:bg-green-700 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
+        <span>💾</span> <span class="text-sm">บันทึก PDF (แนวนอน)</span>
+    </button>
+    
+    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
+        <span>🖨️</span> <span class="text-sm">พิมพ์</span>
+    </button>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <script>
-    /* Script เดิมของคุณ (element_sdk และ config) */
-    (function () {
-      const defaultConfig = {
-        background_color: "#fef9f3",
-        surface_color: "#ffffff",
-        text_color: "#2d2d2d",
-        primary_action_color: "#c19a6b",
-        secondary_action_color: "#e0e0e0",
-        font_family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        font_size: 14,
-        main_title: "โปรแกรมพัฒนาตนเองรายวัน",
-        subtitle: "สร้างนิสัยดี ฝึกจิตใจ เสริมสร้างร่างกาย",
-        morning_mindset_title: "จิตใจยามเช้า",
-        morning_mindset_prompt: "วันนี้ฉันขอบคุณสำหรับ:",
-        laser_focus_title: "สิ่งสำคัญ 3 อันดับแรก",
-        task_list_title: "รายการงาน / ตารางเวลา",
-        physical_health_title: "สุขภาพร่างกาย",
-        growth_title: "การเติบโต / สะท้อนความคิด",
-        growth_prompt: "ชิงชัย บทเรียน การเปลี่ยนแปลงความคิด:",
-        footer_note: "ก้าวเล็กๆ ทุกวันนำไปสู่การเปลี่ยนแปลงครั้งใหญ่"
-      };
+    /* --- Logic หลักของโปรแกรม --- */
 
-      async function onConfigChange(config) {
-        const cfg = Object.assign({}, defaultConfig, config || {});
-        const root = document.getElementById("planner-root");
-        const card = document.getElementById("planner-card");
-        if (!root || !card) return;
+    // 1. จัดการ Checkbox แบบวงกลม (Circle) และ สี่เหลี่ยม (Square) และ หยดน้ำ
+    function setupInteractions() {
+        // Circle Checkboxes
+        document.querySelectorAll('[data-role="check-circle"]').forEach(el => {
+            el.addEventListener('click', () => {
+                const isActive = el.classList.contains('bg-[#c19a6b]');
+                if(isActive) {
+                    el.classList.remove('bg-[#c19a6b]', 'border-[#c19a6b]');
+                    el.classList.add('border-gray-300');
+                    el.innerHTML = '';
+                    el.dataset.checked = "false";
+                } else {
+                    el.classList.add('bg-[#c19a6b]', 'border-[#c19a6b]');
+                    el.classList.remove('border-gray-300');
+                    el.innerHTML = '<span class="text-white text-xs flex items-center justify-center h-full">✓</span>';
+                    el.dataset.checked = "true";
+                }
+                saveData();
+            });
+        });
 
-        const baseFontStack = "Arial, sans-serif";
-        const fontFamily = cfg.font_family + ", " + baseFontStack;
-        const baseSize = Number(cfg.font_size) || defaultConfig.font_size;
+        // Square Checkboxes
+        document.querySelectorAll('[data-role="check-square"]').forEach(el => {
+            el.addEventListener('click', () => {
+                const isActive = el.classList.contains('bg-[#c19a6b]');
+                if(isActive) {
+                    el.classList.remove('bg-[#c19a6b]', 'border-[#c19a6b]');
+                    el.classList.add('border-gray-300');
+                    el.innerHTML = '';
+                    el.dataset.checked = "false";
+                } else {
+                    el.classList.add('bg-[#c19a6b]', 'border-[#c19a6b]');
+                    el.classList.remove('border-gray-300');
+                    el.innerHTML = '<span class="text-white text-xs flex items-center justify-center h-full">✓</span>';
+                    el.dataset.checked = "true";
+                }
+                saveData();
+            });
+        });
 
-        // Apply styles only for screen (not overwrite print styles if possible, but JS overrides inline styles)
-        // Note: Inline styles override CSS classes. Print CSS uses !important to fight this back.
+        // Water Drops
+        document.querySelectorAll('[data-role="water-drop"]').forEach(el => {
+            el.addEventListener('click', () => {
+                const isActive = el.classList.contains('bg-blue-400');
+                if(isActive) {
+                    el.classList.remove('bg-blue-400', 'text-white', 'border-blue-400');
+                    el.classList.add('border-blue-300', 'text-blue-300');
+                    el.dataset.checked = "false";
+                } else {
+                    el.classList.add('bg-blue-400', 'text-white', 'border-blue-400');
+                    el.classList.remove('border-blue-300', 'text-blue-300');
+                    el.dataset.checked = "true";
+                }
+                saveData();
+            });
+        });
+
+        // Inputs & Textareas -> Save on type
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('input', saveData);
+        });
+    }
+
+    // 2. ระบบบันทึกข้อมูล (LocalStorage)
+    function saveData() {
+        // Save Inputs
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            if(el.id) localStorage.setItem('planner_v2_' + el.id, el.value);
+        });
         
-        root.style.backgroundColor = cfg.background_color;
-        card.style.backgroundColor = cfg.surface_color;
-        card.style.color = cfg.text_color;
+        // Save Checkboxes (Index based for simplicity within groups)
+        const circles = document.querySelectorAll('[data-role="check-circle"]');
+        circles.forEach((el, idx) => localStorage.setItem('planner_v2_circle_'+idx, el.dataset.checked));
 
-        const shadowEls = ["mm-shadow","lf-shadow","tl-shadow","ph-shadow","gr-shadow"];
-        shadowEls.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.style.backgroundColor = cfg.secondary_action_color;
-        });
+        const squares = document.querySelectorAll('[data-role="check-square"]');
+        squares.forEach((el, idx) => localStorage.setItem('planner_v2_square_'+idx, el.dataset.checked));
 
-        const titleBars = ["mm-title-bar","lf-title-bar","tl-title-bar","ph-title-bar","gr-title-bar"];
-        titleBars.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            el.style.backgroundColor = cfg.primary_action_color;
-            el.style.color = "#ffffff";
-          }
-        });
-
-        const cardIds = ["mm-card","lf-card","tl-card","ph-card","gr-card"];
-        cardIds.forEach(id => {
-          const el = document.getElementById(id);
-          if (el) {
-            el.style.backgroundColor = cfg.surface_color;
-            el.style.borderColor = cfg.primary_action_color;
-          }
-        });
-
-        const titleEl = document.getElementById("main-title");
-        const subtitleEl = document.getElementById("subtitle-text");
-        const footerNote = document.getElementById("footer-note");
-        if (titleEl) {
-          titleEl.style.fontFamily = fontFamily;
-          titleEl.style.fontSize = (baseSize * 1.6) + "px";
-          titleEl.textContent = cfg.main_title;
-        }
-        if (subtitleEl) {
-          subtitleEl.style.fontFamily = fontFamily;
-          subtitleEl.style.fontSize = (baseSize * 0.85) + "px";
-          subtitleEl.textContent = cfg.subtitle;
-        }
-        if (footerNote) {
-          footerNote.style.fontFamily = fontFamily;
-          footerNote.style.fontSize = (baseSize * 0.8) + "px";
-          footerNote.textContent = cfg.footer_note;
-        }
-
-        const mmTitle = document.getElementById("mm-title");
-        const lfTitle = document.getElementById("lf-title");
-        const tlTitle = document.getElementById("tl-title");
-        const phTitle = document.getElementById("ph-title");
-        const grTitle = document.getElementById("gr-title");
-        const mmPrompt = document.getElementById("mm-prompt");
-        const grPrompt = document.getElementById("gr-prompt");
-
-        if (mmTitle) {
-          mmTitle.textContent = cfg.morning_mindset_title;
-          mmTitle.style.fontFamily = fontFamily;
-          mmTitle.style.fontSize = (baseSize * 0.9) + "px";
-        }
-        if (lfTitle) {
-          lfTitle.textContent = cfg.laser_focus_title;
-          lfTitle.style.fontFamily = fontFamily;
-          lfTitle.style.fontSize = (baseSize * 0.9) + "px";
-        }
-        if (tlTitle) {
-          tlTitle.textContent = cfg.task_list_title;
-          tlTitle.style.fontFamily = fontFamily;
-          tlTitle.style.fontSize = (baseSize * 0.9) + "px";
-        }
-        if (phTitle) {
-          phTitle.textContent = cfg.physical_health_title;
-          phTitle.style.fontFamily = fontFamily;
-          phTitle.style.fontSize = (baseSize * 0.9) + "px";
-        }
-        if (grTitle) {
-          grTitle.textContent = cfg.growth_title;
-          grTitle.style.fontFamily = fontFamily;
-          grTitle.style.fontSize = (baseSize * 0.9) + "px";
-        }
-        if (mmPrompt) {
-          mmPrompt.textContent = cfg.morning_mindset_prompt;
-          mmPrompt.style.fontFamily = fontFamily;
-          mmPrompt.style.fontSize = (baseSize * 0.8) + "px";
-          mmPrompt.style.color = cfg.text_color;
-        }
-        if (grPrompt) {
-          grPrompt.textContent = cfg.growth_prompt;
-          grPrompt.style.fontFamily = fontFamily;
-          grPrompt.style.fontSize = (baseSize * 0.8) + "px";
-          grPrompt.style.color = cfg.text_color;
-        }
-
-        const textNodes = document.querySelectorAll("label, input, textarea, select, button, li, p, span, h2");
-        textNodes.forEach(node => {
-          node.style.fontFamily = fontFamily;
-        });
-
-        const smallTextNodes = document.querySelectorAll("label, input, textarea, select, button, li, span, p");
-        smallTextNodes.forEach(node => {
-          node.style.fontSize = (baseSize * 0.85) + "px";
-          if (!node.closest("#main-title")) {
-            node.style.color = cfg.text_color;
-          }
-        });
-
-        // Checkbox logic
-        const circleCheckboxes = document.querySelectorAll('[data-role="circle-checkbox"]');
-        circleCheckboxes.forEach(btn => {
-          if (!btn.dataset.bound) {
-            btn.dataset.bound = "true";
-            btn.addEventListener("click", () => {
-              const active = btn.getAttribute("data-active") === "true";
-              if (active) {
-                btn.removeAttribute("data-active");
-                btn.style.backgroundColor = "transparent";
-                btn.style.borderColor = cfg.secondary_action_color;
-                btn.textContent = "";
-              } else {
-                btn.setAttribute("data-active", "true");
-                btn.style.backgroundColor = cfg.primary_action_color;
-                btn.style.borderColor = cfg.primary_action_color;
-                btn.textContent = "✓";
-                btn.style.color = "#ffffff";
-              }
-            });
-          }
-          if (btn.getAttribute("data-active") !== "true") {
-            btn.style.backgroundColor = "transparent";
-            btn.style.borderColor = cfg.secondary_action_color;
-            btn.textContent = "";
-          }
-        });
-
-        const squareCheckboxes = document.querySelectorAll('[data-role="square-checkbox"]');
-        squareCheckboxes.forEach(btn => {
-          if (!btn.dataset.bound) {
-            btn.dataset.bound = "true";
-            btn.addEventListener("click", () => {
-              const active = btn.getAttribute("data-active") === "true";
-              if (active) {
-                btn.removeAttribute("data-active");
-                btn.style.backgroundColor = "transparent";
-                btn.style.borderColor = cfg.secondary_action_color;
-                btn.textContent = "";
-              } else {
-                btn.setAttribute("data-active", "true");
-                btn.style.backgroundColor = cfg.primary_action_color;
-                btn.style.borderColor = cfg.primary_action_color;
-                btn.textContent = "✓";
-                btn.style.color = "#ffffff";
-              }
-            });
-          }
-          if (btn.getAttribute("data-active") !== "true") {
-            btn.style.backgroundColor = "transparent";
-            btn.style.borderColor = cfg.secondary_action_color;
-            btn.textContent = "";
-          }
-        });
-
-        const waterUnits = document.querySelectorAll('[data-role="water-unit"]');
-        waterUnits.forEach(btn => {
-          if (!btn.dataset.bound) {
-            btn.dataset.bound = "true";
-            btn.addEventListener("click", () => {
-              const active = btn.getAttribute("data-active") === "true";
-              if (active) {
-                btn.removeAttribute("data-active");
-                btn.style.backgroundColor = "transparent";
-                btn.style.borderColor = cfg.secondary_action_color;
-              } else {
-                btn.setAttribute("data-active", "true");
-                btn.style.backgroundColor = cfg.primary_action_color;
-                btn.style.borderColor = cfg.primary_action_color;
-              }
-            });
-          }
-          if (btn.getAttribute("data-active") !== "true") {
-            btn.style.backgroundColor = "transparent";
-            btn.style.borderColor = cfg.secondary_action_color;
-          }
-        });
-
-        const allInputs = document.querySelectorAll("input, textarea, select");
-        allInputs.forEach(el => {
-          el.style.borderColor = cfg.secondary_action_color;
-          el.style.backgroundColor = cfg.surface_color;
-        });
-      }
-
-      if (window.elementSdk) {
-        window.elementSdk.init({
-          defaultConfig,
-          onConfigChange
-        });
-      } else {
-        onConfigChange(defaultConfig);
-      }
-    })();
-  </script>
-
-  <!-- Extra JS: Save PDF and Auto-save -->
-  <script>
-    function loadScript(src){
-      return new Promise((resolve, reject) => {
-        if(document.querySelector('script[src="'+src+'"]')) return resolve();
-        const s = document.createElement('script');
-        s.src = src;
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
+        const water = document.querySelectorAll('[data-role="water-drop"]');
+        water.forEach((el, idx) => localStorage.setItem('planner_v2_water_'+idx, el.dataset.checked));
     }
 
-    function addSavePdfButton(){
-      const container = document.querySelector('.fixed.bottom-6.right-6');
-      if(!container) return;
-      if(document.getElementById('save-pdf-btn')) return;
-      const btn = document.createElement('button');
-      btn.id = 'save-pdf-btn';
-      btn.className = 'ml-2 bg-green-600 hover:bg-green-700 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105 no-print';
-      btn.innerHTML = '<span style="font-size:1.1em">💾</span> บันทึกเป็น PDF';
-      btn.addEventListener('click', savePDF);
-      container.appendChild(btn);
+    function loadData() {
+        // Load Inputs
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            if(el.id) {
+                const val = localStorage.getItem('planner_v2_' + el.id);
+                if(val !== null) el.value = val;
+            }
+        });
+
+        // Load Circles
+        document.querySelectorAll('[data-role="check-circle"]').forEach((el, idx) => {
+            if(localStorage.getItem('planner_v2_circle_'+idx) === "true") el.click();
+        });
+
+        // Load Squares
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
+            if(localStorage.getItem('planner_v2_square_'+idx) === "true") el.click();
+        });
+
+        // Load Water
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
+            if(localStorage.getItem('planner_v2_water_'+idx) === "true") el.click();
+        });
     }
 
-    async function savePDF(){
-      try{
-        if(!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-        if(!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+    // 3. ใส่วันที่อัตโนมัติ
+    function setAutoDate() {
+        const dateInput = document.getElementById('date-input');
+        if (dateInput && !dateInput.value) {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('th-TH', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+            });
+            dateInput.value = dateStr;
+            saveData();
+        }
+    }
+
+    // 4. ปุ่มเริ่มวันใหม่ (Reset)
+    document.getElementById('reset-btn').addEventListener('click', () => {
+        if(confirm('คุณต้องการล้างข้อมูลทั้งหมดเพื่อเริ่มวันใหม่ใช่หรือไม่?')) {
+            Object.keys(localStorage).forEach(key => {
+                if(key.startsWith('planner_v2_')) localStorage.removeItem(key);
+            });
+            location.reload();
+        }
+    });
+
+    // 5. บันทึกเป็น PDF (A4 Landscape)
+    document.getElementById('save-pdf-btn').addEventListener('click', async () => {
         const { jsPDF } = window.jspdf;
         const area = document.getElementById('planner-card');
-        if(!area){ alert('ไม่พบเนื้อหาที่จะบันทึก'); return; }
-        const focusEls = document.querySelectorAll(':focus');
-        if(focusEls.length) focusEls.forEach(el => el.blur());
+        
+        // จำค่าเดิมไว้
+        const originalStyle = area.getAttribute('style');
+        
+        // บังคับขนาดให้เหมือนกับ A4 Landscape (px @ 96dpi approx) เพื่อให้ Grid ทำงาน
+        area.style.width = '1123px'; 
+        area.style.height = '794px';
+        area.style.position = 'fixed';
+        area.style.top = '0';
+        area.style.left = '0';
+        area.style.zIndex = '-9999';
+        
+        // เพิ่ม Class เพื่อ Trigger CSS @media print (หรือเลียนแบบ Grid)
+        // เนื่องจาก html2canvas อ่าน media print ไม่เก่ง เราจะปล่อยให้ grid ทำงานตาม width ที่กว้างขึ้น
+        
+        try {
+            const canvas = await html2canvas(area, {
+                scale: 2, // เพิ่มความชัด
+                useCORS: true,
+                width: 1123,
+                height: 794,
+                windowWidth: 1123,
+                windowHeight: 794
+            });
 
-        const canvas = await html2canvas(area, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p','mm','a4');
-        const pdfWidth = 210;
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        if(pdfHeight <= 295){
-          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        } else {
-          // paginate
-          const pageHeightPx = Math.floor((canvas.width * 295) / pdfWidth);
-          let position = 0;
-          while(position < canvas.height){
-            const pageCanvas = document.createElement('canvas');
-            pageCanvas.width = canvas.width;
-            pageCanvas.height = Math.min(pageHeightPx, canvas.height - position);
-            const ctx = pageCanvas.getContext('2d');
-            ctx.drawImage(canvas, 0, position, pageCanvas.width, pageCanvas.height, 0, 0, pageCanvas.width, pageCanvas.height);
-            const pageImg = pageCanvas.toDataURL('image/png');
-            if(position === 0) pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, 295); else { pdf.addPage(); pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, 295); }
-            position += pageCanvas.height;
-          }
+            // คืนค่าเดิมทันที
+            area.removeAttribute('style'); // ลบ inline style ที่เติมไป
+            if(originalStyle) area.setAttribute('style', originalStyle);
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('l', 'mm', 'a4'); // 'l' = landscape
+            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+            
+            const dateVal = document.getElementById('date-input').value.replace(/\//g, '-');
+            pdf.save(`Daily_Plan_${dateVal || 'new'}.pdf`);
+
+        } catch (err) {
+            console.error(err);
+            alert('เกิดข้อผิดพลาดในการสร้าง PDF');
+            area.removeAttribute('style');
         }
-        const fname = (document.getElementById('date-input')?.value || 'planner') + '_planner.pdf';
-        pdf.save(fname);
-      }catch(e){ console.error(e); alert('เกิดข้อผิดพลาดขณะบันทึก PDF'); }
-    }
-
-    function storageKeyFor(el){
-      return 'planner::' + (el.id || el.name || el.tagName + ':' + Array.from(document.querySelectorAll(el.tagName)).indexOf(el));
-    }
-    function loadSaved(){
-      const elements = document.querySelectorAll('#planner-card input, #planner-card textarea, #planner-card select');
-      elements.forEach(el => {
-        const key = storageKeyFor(el);
-        const saved = localStorage.getItem(key);
-        if(saved !== null){
-          if(el.type === 'checkbox' || el.type === 'radio') el.checked = saved === '1'; else el.value = saved;
-        }
-      });
-    }
-    function saveOnInput(){
-      const elements = document.querySelectorAll('#planner-card input, #planner-card textarea, #planner-card select');
-      elements.forEach(el => {
-        const key = storageKeyFor(el);
-        el.addEventListener('input', () => {
-          if(el.type === 'checkbox' || el.type === 'radio') localStorage.setItem(key, el.checked ? '1' : '0'); else localStorage.setItem(key, el.value);
-        });
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      addSavePdfButton();
-      loadSaved();
-      saveOnInput();
-      window.addEventListener('keydown', (e) => { if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); savePDF(); } });
     });
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+        setupInteractions();
+        loadData();
+        setAutoDate();
+    });
+
   </script>
  </body>
 </html>
