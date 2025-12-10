@@ -3,6 +3,7 @@
  <head>
   <meta charset="UTF-8">
   <title>แผนพัฒนาตนเองรายวัน</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="/_sdk/element_sdk.js"></script>
   <style>
@@ -202,9 +203,10 @@
   </div>
 
   <div class="fixed bottom-6 right-6 no-print z-50">
-    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-6 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
-        <span style="font-size: 1.2em;">📄</span> บันทึกเป็น PDF / พิมพ์
+    <button id="print-btn" onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-6 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
+        <span style="font-size: 1.2em;">📄</span> พิมพ์
     </button>
+    <!-- Save PDF button will be added dynamically to keep original file structure untouched -->
   </div>
 
   <script>
@@ -443,6 +445,99 @@
         onConfigChange(defaultConfig);
       }
     })();
+  </script>
+
+  <!-- Extra JS: Save PDF and Auto-save -->
+  <script>
+    function loadScript(src){
+      return new Promise((resolve, reject) => {
+        if(document.querySelector('script[src="'+src+'"]')) return resolve();
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    function addSavePdfButton(){
+      const container = document.querySelector('.fixed.bottom-6.right-6');
+      if(!container) return;
+      if(document.getElementById('save-pdf-btn')) return;
+      const btn = document.createElement('button');
+      btn.id = 'save-pdf-btn';
+      btn.className = 'ml-2 bg-green-600 hover:bg-green-700 text-white shadow-lg rounded-full px-4 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105 no-print';
+      btn.innerHTML = '<span style="font-size:1.1em">💾</span> บันทึกเป็น PDF';
+      btn.addEventListener('click', savePDF);
+      container.appendChild(btn);
+    }
+
+    async function savePDF(){
+      try{
+        if(!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+        if(!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+        const { jsPDF } = window.jspdf;
+        const area = document.getElementById('planner-card');
+        if(!area){ alert('ไม่พบเนื้อหาที่จะบันทึก'); return; }
+        const focusEls = document.querySelectorAll(':focus');
+        if(focusEls.length) focusEls.forEach(el => el.blur());
+
+        const canvas = await html2canvas(area, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p','mm','a4');
+        const pdfWidth = 210;
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        if(pdfHeight <= 295){
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        } else {
+          // paginate
+          const pageHeightPx = Math.floor((canvas.width * 295) / pdfWidth);
+          let position = 0;
+          while(position < canvas.height){
+            const pageCanvas = document.createElement('canvas');
+            pageCanvas.width = canvas.width;
+            pageCanvas.height = Math.min(pageHeightPx, canvas.height - position);
+            const ctx = pageCanvas.getContext('2d');
+            ctx.drawImage(canvas, 0, position, pageCanvas.width, pageCanvas.height, 0, 0, pageCanvas.width, pageCanvas.height);
+            const pageImg = pageCanvas.toDataURL('image/png');
+            if(position === 0) pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, 295); else { pdf.addPage(); pdf.addImage(pageImg, 'PNG', 0, 0, pdfWidth, 295); }
+            position += pageCanvas.height;
+          }
+        }
+        const fname = (document.getElementById('date-input')?.value || 'planner') + '_planner.pdf';
+        pdf.save(fname);
+      }catch(e){ console.error(e); alert('เกิดข้อผิดพลาดขณะบันทึก PDF'); }
+    }
+
+    function storageKeyFor(el){
+      return 'planner::' + (el.id || el.name || el.tagName + ':' + Array.from(document.querySelectorAll(el.tagName)).indexOf(el));
+    }
+    function loadSaved(){
+      const elements = document.querySelectorAll('#planner-card input, #planner-card textarea, #planner-card select');
+      elements.forEach(el => {
+        const key = storageKeyFor(el);
+        const saved = localStorage.getItem(key);
+        if(saved !== null){
+          if(el.type === 'checkbox' || el.type === 'radio') el.checked = saved === '1'; else el.value = saved;
+        }
+      });
+    }
+    function saveOnInput(){
+      const elements = document.querySelectorAll('#planner-card input, #planner-card textarea, #planner-card select');
+      elements.forEach(el => {
+        const key = storageKeyFor(el);
+        el.addEventListener('input', () => {
+          if(el.type === 'checkbox' || el.type === 'radio') localStorage.setItem(key, el.checked ? '1' : '0'); else localStorage.setItem(key, el.value);
+        });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      addSavePdfButton();
+      loadSaved();
+      saveOnInput();
+      window.addEventListener('keydown', (e) => { if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); savePDF(); } });
+    });
   </script>
  </body>
 </html>
