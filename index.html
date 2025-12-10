@@ -2,7 +2,7 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเองรายวัน (Full A4 Landscape)</title>
+  <title>แผนพัฒนาตนเองรายวัน (ภาษาไทย - เต็มแผ่น)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -22,15 +22,15 @@
     .focus-ring:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
 
     /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
 
-    /* --- CSS สำหรับการพิมพ์ (Print / Save PDF) --- */
+    /* --- CSS เฉพาะสำหรับการพิมพ์ (สำคัญมาก) --- */
     @media print {
         @page {
-            size: A4 landscape; /* กระดาษแนวนอน */
-            margin: 0;          /* ตัดขอบขาวออกให้หมด */
+            size: A4 landscape; /* บังคับแนวนอน */
+            margin: 0;          /* ตัดขอบ Default ของ Browser */
         }
         
         body {
@@ -39,9 +39,9 @@
             background-color: white !important;
             -webkit-print-color-adjust: exact !important; 
             print-color-adjust: exact !important;
-            width: 297mm;  /* ความกว้าง A4 แนวนอน */
-            height: 210mm; /* ความสูง A4 แนวนอน */
-            overflow: hidden;
+            width: 297mm;
+            height: 210mm;
+            overflow: hidden; /* ห้ามมี Scrollbar โผล่ */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -49,69 +49,53 @@
 
         .no-print { display: none !important; }
 
-        .app-wrapper {
-            display: block !important;
-            width: 100% !important;
-            height: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: visible !important;
-            background-color: white !important;
-        }
-
-        /* Container หลักสำหรับการพิมพ์ */
+        /* ปรับขนาดการ์ดหลักให้ "เล็กกว่า A4 นิดหน่อย" เพื่อกันตกขอบ */
         #planner-card {
-            width: 290mm !important; /* กว้างเกือบเต็ม A4 */
-            height: 200mm !important; /* สูงเกือบเต็ม A4 */
-            margin: auto !important;
-            padding: 10px 20px !important;
+            width: 285mm !important;  /* เหลือขอบซ้ายขวาข้างละ 6mm */
+            height: 195mm !important; /* เหลือขอบบนล่างข้างละ 7.5mm (แก้ปัญหาล้นแผ่น 2) */
+            margin: 0 !important;
+            padding: 10px !important;
             border: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
-            
-            /* บังคับ Layout ให้เหมือนหน้าจอ (2 คอลัมน์) */
             display: flex !important;
             flex-direction: column !important;
         }
 
-        /* ส่วนหัว */
         header {
-            padding: 10px 0 !important;
-            margin-bottom: 10px !important;
+            padding: 5px 0 10px 0 !important; /* ลดความสูงส่วนหัว */
         }
-        h1#main-title { font-size: 24pt !important; }
         
-        /* จัด Grid เนื้อหา */
+        h1#main-title { font-size: 22pt !important; }
+        
+        /* บังคับ Grid 2 คอลัมน์ */
         #planner-content-grid {
             display: grid !important;
-            grid-template-columns: 1fr 1fr !important; /* บังคับ 2 คอลัมน์ซ้ายขวา เหมือนหน้าจอ */
-            gap: 15px !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 10px !important; /* ลดช่องว่างลง */
             flex: 1;
             height: auto !important;
         }
 
-        /* ปรับขนาดตัวอักษรและช่องว่างให้พอดีกระดาษ */
-        section { padding: 0 !important; }
+        /* ปรับองค์ประกอบย่อยให้แน่นขึ้น */
         article { 
-            border: 1px solid #ddd !important; /* เพิ่มเส้นขอบบางๆ ตอนปริ้น */
+            border: 1px solid #aaa !important; 
             box-shadow: none !important;
-            border-radius: 8px !important;
         }
-        
-        /* ซ่อนเงา (Shadow divs) ตอนพิมพ์เพื่อให้สะอาดตา */
         .shadow-offset { display: none !important; }
         
-        /* ลดขนาดพื้นที่ว่าง (Padding/Margin) เพื่อให้ยัดลง A4 ได้หมด */
-        .p-4 { padding: 10px !important; }
-        .gap-6 { gap: 10px !important; }
-        .gap-5 { gap: 10px !important; }
-        
-        /* ปรับ Textarea/Input */
-        textarea { resize: none !important; }
-        input, textarea, select { 
-            background-color: #fff !important; 
-            border: 1px solid #ccc !important;
+        /* ลด Padding ภายในกล่อง */
+        .p-3 { padding: 8px !important; }
+        .gap-4 { gap: 8px !important; }
+        .gap-3 { gap: 6px !important; }
+
+        input, textarea, select {
+            border: 1px solid #bbb !important;
+            background-color: #fff !important;
         }
+        
+        /* ซ่อนส่วนที่เกิน */
+        .overflow-y-auto { overflow: hidden !important; }
     }
   </style>
  </head>
@@ -120,36 +104,35 @@
   <div id="app-root" class="app-wrapper h-full w-full overflow-auto flex items-center justify-center p-4">
    <div id="planner-root" class="w-full flex items-center justify-center">
     
-    <main id="planner-card" class="w-full max-w-6xl rounded-2xl shadow-xl flex flex-col bg-white min-h-[800px] border border-gray-200">
+    <main id="planner-card" class="w-full max-w-6xl rounded-2xl shadow-xl flex flex-col bg-white min-h-[750px] border border-gray-200 p-6">
      
-     <header class="w-full px-8 pt-6 pb-2 border-b flex flex-col gap-2">
+     <header class="w-full px-4 pb-2 border-b flex flex-col gap-1 mb-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
-       <div class="space-y-1">
-        <h1 id="main-title" class="font-bold tracking-wide text-2xl text-gray-800 uppercase">โปรแกรมพัฒนาตนเองรายวัน</h1>
-        <p class="text-sm text-gray-500">Daily Self-Development Planner</p>
+       <div class="space-y-0.5">
+        <h1 id="main-title" class="font-bold tracking-wide text-2xl text-gray-800 uppercase">แผนพัฒนาตนเองรายวัน</h1>
+        <p class="text-sm text-gray-500">สร้างวินัย ฝึกจิตใจ เสริมสร้างร่างกาย</p>
        </div>
        <div class="flex flex-col items-end gap-1">
-        <label for="date-input" class="text-xs text-gray-500 font-semibold">DATE</label> 
-        <input id="date-input" type="text" placeholder="DD / MM / YYYY" class="focus-ring rounded-md px-3 py-1.5 text-sm border bg-gray-50 text-right w-40 font-medium">
+        <label for="date-input" class="text-xs text-gray-500 font-semibold">วันที่</label> 
+        <input id="date-input" type="text" placeholder="วว / ดด / ปปปป" class="focus-ring rounded-md px-3 py-1.5 text-sm border bg-gray-50 text-right w-40 font-medium">
        </div>
       </div>
      </header>
 
-     <section class="flex-1 w-full px-6 py-6 overflow-hidden">
-      <div id="planner-content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+     <section class="flex-1 w-full overflow-hidden">
+      <div id="planner-content-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5 h-full">
        
-       <section class="flex flex-col gap-4 h-full">
+       <section class="flex flex-col gap-3 h-full">
         
-        <div class="grid grid-cols-2 gap-4">
-            <article class="relative group h-full">
+        <div class="grid grid-cols-2 gap-3 h-[160px]"> <article class="relative group h-full">
              <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
              <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
               <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
                <span>☀️</span><h2 class="text-xs font-bold uppercase tracking-wider">จิตใจยามเช้า</h2>
               </div>
               <div class="p-3 flex-1 flex flex-col gap-2">
-                <textarea id="gratitude-1" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-2 py-1 text-xs resize-none h-full" placeholder="ขอบคุณ 1..."></textarea> 
-                <textarea id="gratitude-2" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-2 py-1 text-xs resize-none h-full" placeholder="ขอบคุณ 2..."></textarea>
+                <textarea id="gratitude-1" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-2 py-1 text-xs resize-none h-full" placeholder="1. ขอบคุณสำหรับ..."></textarea> 
+                <textarea id="gratitude-2" class="focus-ring w-full rounded border-gray-300 bg-gray-50 px-2 py-1 text-xs resize-none h-full" placeholder="2. ขอบคุณสำหรับ..."></textarea>
               </div>
              </div>
             </article>
@@ -158,10 +141,10 @@
              <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
              <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
               <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-               <span>🎯</span><h2 class="text-xs font-bold uppercase tracking-wider">3 สิ่งสำคัญ</h2>
+               <span>🎯</span><h2 class="text-xs font-bold uppercase tracking-wider">3 สิ่งสำคัญวันนี้</h2>
               </div>
               <div class="p-3 flex-1 flex flex-col justify-center gap-2">
-                <input id="prio-1" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="1. สำคัญสุด">
+                <input id="prio-1" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="1. สำคัญที่สุด">
                 <input id="prio-2" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="2. รองลงมา">
                 <input id="prio-3" type="text" class="focus-ring w-full rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="3. รองลงมา">
               </div>
@@ -178,7 +161,8 @@
           <div class="p-3 flex-1 flex flex-col gap-2 overflow-y-auto">
            <div class="flex flex-col gap-1.5 h-full">
              <script>
-                for(let i=1; i<=11; i++){
+                // สร้างรายการงาน 10 บรรทัด (ลดลงนิดหน่อยเพื่อให้ไม่ล้นหน้า)
+                for(let i=1; i<=10; i++){
                     document.write(`
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] text-gray-400 w-8 text-right">${7+i-1}:00</span>
@@ -194,22 +178,22 @@
         </article>
        </section>
 
-       <section class="flex flex-col gap-4 h-full">
+       <section class="flex flex-col gap-3 h-full">
         
-        <article class="relative group">
+        <article class="relative group h-[160px]">
          <div class="shadow-offset absolute inset-0 translate-x-1 translate-y-1 rounded-xl bg-gray-200"></div>
          <div class="card-container relative rounded-xl border border-gray-200 bg-white h-full flex flex-col overflow-hidden">
           <div class="px-3 py-2 bg-[#c19a6b] text-white flex items-center gap-2">
-           <span>💪</span><h2 class="text-xs font-bold uppercase tracking-wider">สุขภาพร่างกาย (Body & Health)</h2>
+           <span>💪</span><h2 class="text-xs font-bold uppercase tracking-wider">สุขภาพร่างกาย</h2>
           </div>
-          <div class="p-3 flex-1 flex flex-col gap-3 text-sm">
+          <div class="p-3 flex-1 flex flex-col gap-2 text-sm justify-center">
            
            <div class="flex items-center justify-between">
              <div class="flex items-center gap-2">
                <span class="font-semibold text-gray-700 text-xs">🏃 ออกกำลังกาย:</span>
                <input id="ex-min" type="text" class="focus-ring w-12 text-center rounded border-gray-300 px-1 py-1 text-xs bg-gray-50" placeholder="นาที">
              </div>
-             <input id="ex-type" type="text" class="focus-ring w-32 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="ทำอะไร...">
+             <input id="ex-type" type="text" class="focus-ring w-32 rounded border-gray-300 px-2 py-1 text-xs bg-gray-50" placeholder="กิจกรรม...">
            </div>
 
            <div class="flex items-center gap-2">
@@ -229,7 +213,7 @@
             <span class="text-xs text-gray-400">|</span>
             <span class="text-xs text-gray-500">คุณภาพ:</span>
             <select id="sleep-qual" class="focus-ring rounded border-gray-300 px-1 py-1 text-xs bg-gray-50">
-                <option>-</option><option>ดีมาก</option><option>ดี</option><option>พอใช้</option><option>แย่</option>
+                <option>-</option><option>ดีเยี่ยม</option><option>ดี</option><option>พอใช้</option><option>ควรปรับปรุง</option>
             </select>
            </div>
           </div>
@@ -243,7 +227,7 @@
            <span>📓</span><h2 class="text-xs font-bold uppercase tracking-wider">บันทึกการเรียนรู้ / ข้อคิดวันนี้</h2>
           </div>
           <div class="p-3 flex-1 flex flex-col gap-2 h-full">
-            <textarea id="growth-notes" class="focus-ring w-full h-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-sm resize-none leading-relaxed" placeholder="วันนี้เรียนรู้อะไร? มีอะไรที่อยากทำให้ดีขึ้นในวันพรุ่งนี้?"></textarea>
+            <textarea id="growth-notes" class="focus-ring w-full h-full rounded border-gray-300 bg-gray-50 px-3 py-2 text-sm resize-none leading-relaxed" placeholder="วันนี้ได้เรียนรู้อะไรใหม่? หรือมีอะไรที่อยากทำให้ดีขึ้นในวันพรุ่งนี้?"></textarea>
           </div>
          </div>
         </article>
@@ -252,9 +236,9 @@
       </div>
      </section>
 
-     <footer class="w-full px-8 py-3 border-t text-[10px] flex items-center justify-between text-gray-400">
-      <p>"Small steps every day lead to big changes."</p>
-      <p>Designed for your success.</p>
+     <footer class="w-full px-4 pt-2 border-t text-[10px] flex items-center justify-between text-gray-400 mt-2">
+      <p>"ความสำเร็จเกิดจากการสะสมวินัยเล็กๆ ในทุกวัน"</p>
+      <p>ออกแบบเพื่อความสำเร็จของคุณ</p>
      </footer>
     </main>
    </div>
@@ -276,10 +260,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <script>
-    // --- Logic ส่วนการทำงาน ---
+    // --- JavaScript Logic ---
 
     function setupInteractions() {
-        // Toggle Checkboxes (Square)
+        // จัดการ Checkbox สี่เหลี่ยม
         document.querySelectorAll('[data-role="check-square"]').forEach(el => {
             el.addEventListener('click', () => {
                 const isActive = el.classList.contains('bg-[#c19a6b]');
@@ -298,7 +282,7 @@
             });
         });
 
-        // Toggle Water Drops
+        // จัดการ Checkbox หยดน้ำ
         document.querySelectorAll('[data-role="water-drop"]').forEach(el => {
             el.addEventListener('click', () => {
                 const isActive = el.classList.contains('bg-blue-400');
@@ -315,35 +299,38 @@
             });
         });
 
+        // บันทึกเมื่อพิมพ์ข้อความ
         document.querySelectorAll('input, textarea, select').forEach(el => {
             el.addEventListener('input', saveData);
         });
     }
 
+    // บันทึกลง LocalStorage
     function saveData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            if(el.id) localStorage.setItem('pv3_' + el.id, el.value);
+            if(el.id) localStorage.setItem('pv4_' + el.id, el.value);
         });
-        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv3_sq_'+idx, el.dataset.checked));
-        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv3_w_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv4_sq_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv4_w_'+idx, el.dataset.checked));
     }
 
+    // โหลดข้อมูลเก่า
     function loadData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
             if(el.id) {
-                const val = localStorage.getItem('pv3_' + el.id);
+                const val = localStorage.getItem('pv4_' + el.id);
                 if(val !== null) el.value = val;
             }
         });
         document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv3_sq_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv4_sq_'+idx) === "true") el.click();
         });
         document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv3_w_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv4_w_'+idx) === "true") el.click();
         });
     }
 
-    // Auto Date
+    // ใส่วันที่อัตโนมัติ
     function setAutoDate() {
         const d = document.getElementById('date-input');
         if(d && !d.value) {
@@ -352,42 +339,45 @@
         }
     }
 
-    // Reset
+    // ปุ่ม Reset
     document.getElementById('reset-btn').addEventListener('click', () => {
-        if(confirm('เริ่มวันใหม่ (ล้างข้อมูล)?')) {
-            Object.keys(localStorage).forEach(k => { if(k.startsWith('pv3_')) localStorage.removeItem(k); });
+        if(confirm('ต้องการเริ่มวันใหม่หรือไม่? (ข้อมูลทั้งหมดจะถูกล้าง)')) {
+            Object.keys(localStorage).forEach(k => { if(k.startsWith('pv4_')) localStorage.removeItem(k); });
             location.reload();
         }
     });
 
-    // Save PDF (Landscape Fix)
+    // ปุ่มบันทึก PDF (แก้ปัญหาหน้าล้นด้วยการ Fix ขนาดพื้นที่ Render)
     document.getElementById('save-pdf-btn').addEventListener('click', async () => {
         const { jsPDF } = window.jspdf;
         const area = document.getElementById('planner-card');
         const originalStyle = area.getAttribute('style');
 
-        // บังคับขนาด Grid ให้พอดี A4 Landscape (Pixel conversion: 297mm approx 1122px)
-        area.style.width = '1122px'; 
-        area.style.height = '793px'; 
+        // กำหนดพื้นที่ Render ให้เล็กกว่า A4 เล็กน้อยเพื่อความปลอดภัย (285mm x 195mm)
+        // 1mm = 3.78px approx. -> width ~ 1077px, height ~ 737px
+        area.style.width = '1077px'; 
+        area.style.height = '737px'; 
         area.style.position = 'fixed';
         area.style.top = '0'; 
         area.style.left = '0';
         area.style.zIndex = '-999';
         
         try {
-            const canvas = await html2canvas(area, { scale: 2, width: 1122, height: 793, useCORS: true });
+            const canvas = await html2canvas(area, { scale: 2, width: 1077, height: 737, useCORS: true });
             area.removeAttribute('style');
             if(originalStyle) area.setAttribute('style', originalStyle);
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('l', 'mm', 'a4');
-            pdf.addImage(imgData, 'PNG', 0, 0, 297, 210);
+            // วางภาพโดยเว้นขอบเล็กน้อย (x=6mm, y=7.5mm)
+            pdf.addImage(imgData, 'PNG', 6, 7.5, 285, 195);
+            
             const dateStr = document.getElementById('date-input').value.replace(/\//g,'-');
-            pdf.save(`Planner_${dateStr}.pdf`);
+            pdf.save(`แผนพัฒนาตนเอง_${dateStr}.pdf`);
         } catch(e) {
             console.error(e);
             area.removeAttribute('style');
-            alert('Error creating PDF');
+            alert('เกิดข้อผิดพลาดในการสร้าง PDF');
         }
     });
 
