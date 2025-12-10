@@ -8,79 +8,71 @@
   <style>
     body {
       box-sizing: border-box;
+      font-family: 'Sarabun', sans-serif; /* แนะนำให้หา Font ภาษาไทยสวยๆ มาใส่ถ้าต้องการ */
     }
     /* Custom scrollbars */
-    .app-wrapper::-webkit-scrollbar {
-      width: 8px;
-    }
-    .app-wrapper::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .app-wrapper::-webkit-scrollbar-thumb {
-      background-color: rgba(0,0,0,0.15);
-      border-radius: 999px;
-    }
-    .focus-ring:focus-visible {
-      outline: 2px solid #c19a6b;
-      outline-offset: 2px;
-    }
+    .app-wrapper::-webkit-scrollbar { width: 8px; }
+    .app-wrapper::-webkit-scrollbar-track { background: transparent; }
+    .app-wrapper::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
+    .focus-ring:focus-visible { outline: 2px solid #c19a6b; outline-offset: 2px; }
     
-    /* --- ส่วนที่แก้ไข: ตั้งค่าหน้ากระดาษ A4 สำหรับการพิมพ์ --- */
+    /* --- CSS สำหรับการพิมพ์ (Print / Save as PDF) --- */
     @media print {
         @page {
-            size: A4 portrait; /* บังคับขนาด A4 แนวตั้ง */
-            margin: 10mm;      /* เว้นขอบกระดาษ 10 มม. */
+            size: A4 portrait;
+            margin: 0; /* ตัดขอบ Default ของ Browser ทิ้งเพื่อให้เราจัดเอง */
         }
         
         body {
-            background-color: white !important;
-            -webkit-print-color-adjust: exact !important; /* สั่งให้พิมพ์สีพื้นหลังออกมาด้วย */
-            print-color-adjust: exact !important;
             margin: 0;
             padding: 0;
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important;
         }
 
         .no-print { display: none !important; } /* ซ่อนปุ่ม */
 
-        /* ปรับ Layout ให้เต็มความกว้าง A4 */
-        .app-wrapper { 
-            display: block !important; 
-            overflow: visible !important; 
-            height: auto !important;
-        }
-        
-        #planner-root {
-            padding: 0 !important;
+        /* ปรับ Container หลักให้ยืดเต็มจอ */
+        .app-wrapper, #planner-root {
+            display: block !important;
+            position: relative !important;
             width: 100% !important;
             height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
         }
 
+        /* ปรับการ์ดให้เต็มหน้า A4 พอดี */
         #planner-card {
+            width: 210mm !important; /* ความกว้าง A4 */
+            min-height: 295mm !important; /* ความสูง A4 โดยประมาณ */
+            max-width: none !important;
+            margin: 0 auto !important;
+            padding: 10mm 15mm !important; /* เว้นขอบสวยงาม ซ้าย-ขวา 1.5cm */
+            border: none !important;
             box-shadow: none !important;
-            max-width: 100% !important;
-            width: 100% !important;
-            border: 1px solid #ddd !important;
             border-radius: 0 !important;
         }
 
-        /* บังคับให้เป็น 2 คอลัมน์เสมอ (ป้องกันไม่ให้มันเรียงเป็นแถวเดียวตอนปริ้น) */
+        /* บังคับ Layout 2 คอลัมน์ */
         .grid {
             display: grid !important;
-            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-            gap: 1rem !important;
+            grid-template-columns: 1fr 1fr !important; /* บังคับแบ่งครึ่ง */
+            gap: 1.5rem !important;
         }
 
-        /* ย่อขนาดเนื้อหาทั้งหมดลงเล็กน้อยเพื่อให้จบใน 1 หน้า (Scale 85%) */
-        main {
-            transform: scale(0.95);
-            transform-origin: top center;
-            width: 100%;
+        /* ปรับขนาดตัวอักษรให้ใหญ่อ่านง่ายเมื่อลงกระดาษ */
+        * {
+            font-size: 12pt !important; /* ขนาดมาตรฐานเอกสาร */
         }
+        h1#main-title { font-size: 24pt !important; }
+        h2 { font-size: 14pt !important; padding: 5px !important; }
         
-        /* ปรับขนาดตัวอักษร input ให้ชัดเจนเมื่อลงกระดาษ */
+        /* เส้นขอบ Input ให้ชัดขึ้น */
         input, textarea, select {
-            border: 1px solid #ccc !important;
-            background: transparent !important;
+            border: 1px solid #aaa !important;
         }
     }
   </style>
@@ -210,59 +202,13 @@
   </div>
 
   <div class="fixed bottom-6 right-6 no-print z-50">
-    <button onclick="handleSaveAndPrint()" class="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg rounded-full px-6 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
-        <span style="font-size: 1.2em;">🖨️</span> ยืนยันและพิมพ์
+    <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full px-6 py-3 font-bold flex items-center gap-2 transition-transform transform hover:scale-105">
+        <span style="font-size: 1.2em;">📄</span> บันทึกเป็น PDF / พิมพ์
     </button>
   </div>
 
   <script>
-    function handleSaveAndPrint() {
-        window.print();
-
-        const getVal = (id) => document.getElementById(id)?.value || "";
-        
-        let content = "=== บันทึกแผนพัฒนาตนเองรายวัน ===\n\n";
-        content += `วันที่: ${getVal('date-input')}\n\n`;
-
-        content += "[จิตใจยามเช้า]\n";
-        content += `ขอบคุณ 1: ${getVal('gratitude-1')}\n`;
-        content += `ขอบคุณ 2: ${getVal('gratitude-2')}\n\n`;
-
-        content += "[สิ่งสำคัญ 3 อันดับ]\n";
-        content += `1. ${getVal('prio-1')}\n`;
-        content += `2. ${getVal('prio-2')}\n`;
-        content += `3. ${getVal('prio-3')}\n\n`;
-
-        content += "[รายการงาน]\n";
-        for(let i=1; i<=7; i++) {
-            let task = getVal(`task-${i}`);
-            if(task) content += `- ${task}\n`;
-        }
-        content += "\n";
-
-        content += "[สุขภาพร่างกาย]\n";
-        content += `ออกกำลังกาย: ${getVal('ex-min')} นาที (${getVal('ex-act')})\n`;
-        
-        const waterCount = document.querySelectorAll('[data-role="water-unit"][data-active="true"]').length;
-        content += `ดื่มน้ำ: ${waterCount} แก้ว\n`;
-        content += `การนอน: ${getVal('sleep-hrs')} ชม. (คุณภาพ: ${getVal('sleep-qual')})\n\n`;
-
-        content += "[การเติบโต / สะท้อนความคิด]\n";
-        content += `${getVal('growth-notes')}\n`;
-
-        const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-        const link = document.createElement("a");
-        const dateStr = getVal('date-input').replace(/[\/\s]/g, "-") || "daily-plan";
-        
-        link.href = URL.createObjectURL(blob);
-        link.download = `Plan_${dateStr}.txt`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-  </script>
-
-  <script>
+    /* Script เดิมของคุณ (element_sdk และ config) */
     (function () {
       const defaultConfig = {
         background_color: "#fef9f3",
@@ -294,6 +240,9 @@
         const fontFamily = cfg.font_family + ", " + baseFontStack;
         const baseSize = Number(cfg.font_size) || defaultConfig.font_size;
 
+        // Apply styles only for screen (not overwrite print styles if possible, but JS overrides inline styles)
+        // Note: Inline styles override CSS classes. Print CSS uses !important to fight this back.
+        
         root.style.backgroundColor = cfg.background_color;
         card.style.backgroundColor = cfg.surface_color;
         card.style.color = cfg.text_color;
