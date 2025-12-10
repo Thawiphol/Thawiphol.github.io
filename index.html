@@ -2,7 +2,7 @@
 <html lang="th" class="h-full">
  <head>
   <meta charset="UTF-8">
-  <title>แผนพัฒนาตนเอง (ภาษาไทย 100% - จบในแผ่นเดียว)</title>
+  <title>แผนพัฒนาตนเอง (Day Counter)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,11 +26,18 @@
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.15); border-radius: 999px; }
 
-    /* --- CSS สำหรับการพิมพ์ (ปรับใหม่ให้ปลอดภัยกับ Canon G-Series) --- */
+    /* ซ่อนปุ่ม Spin ของ Input Number */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+
+    /* --- CSS สำหรับการพิมพ์ --- */
     @media print {
         @page {
             size: A4 landscape;
-            margin: 0; /* สั่ง Browser ตัดขอบ แต่ Printer Driver จะยังมีขอบขาวอยู่ */
+            margin: 0; 
         }
         
         body {
@@ -42,8 +49,6 @@
             width: 297mm;
             height: 210mm;
             overflow: hidden;
-            
-            /* จัดกึ่งกลาง */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -52,10 +57,9 @@
         .no-print { display: none !important; }
 
         #planner-card {
-            /* ลดขนาดลงเพื่อให้ปลอดภัยกับขอบขาวของเครื่องปริ้น Inkjet */
+            /* ปรับขนาดให้พอดีเป๊ะกับ A4 Inkjet (ลดความสูงลงอีกนิดเพื่อความชัวร์) */
             width: 280mm !important;
-            height: 185mm !important; /* ลดความสูงเหลือ 18.5cm (ปลอดภัยชัวร์) */
-            
+            height: 180mm !important; 
             margin: 0 !important;
             padding: 10px 15px !important;
             border: 1px solid #ddd !important;
@@ -65,7 +69,6 @@
             flex-direction: column !important;
         }
 
-        /* ปรับส่วนหัวให้เล็กลง */
         header {
             padding-bottom: 5px !important;
             margin-bottom: 5px !important;
@@ -73,9 +76,8 @@
         }
         
         h1#main-title { font-size: 18pt !important; color: #000 !important; }
-        p#subtitle-text { font-size: 10pt !important; }
         
-        /* Grid Layout */
+        /* Layout Grid */
         #planner-content-grid {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
@@ -84,32 +86,25 @@
             overflow: hidden !important;
         }
 
-        /* ปรับแต่งกล่องข้อความ */
+        /* ปรับแต่ง Elements ตอนปริ้น */
         article { 
             border: 1px solid #999 !important; 
             box-shadow: none !important;
         }
         .shadow-offset { display: none !important; }
+        .p-3 { padding: 4px 8px !important; } /* ลด padding ลง */
         
-        /* ลด Padding ให้เนื้อหาแน่นขึ้น */
-        .p-3 { padding: 5px 8px !important; }
-        
-        /* ปรับ Input */
         input, textarea, select {
             border: 1px solid #bbb !important;
             background-color: #fff !important;
             font-size: 9pt !important;
-            padding: 2px 4px !important;
         }
-
-        /* ซ่อน Scrollbar */
-        .overflow-y-auto { overflow: hidden !important; }
         
         /* Footer */
         footer {
             margin-top: 5px !important;
             padding-top: 5px !important;
-            font-size: 9pt !important;
+            font-size: 8pt !important;
         }
     }
   </style>
@@ -124,7 +119,12 @@
      <header class="w-full pb-3 border-b-2 border-[#b08d55] flex flex-col gap-1 mb-4">
       <div class="flex flex-wrap items-center justify-between gap-4">
        <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-[#b08d55] text-white rounded-lg flex items-center justify-center text-xl font-bold">D</div>
+        
+        <div class="relative w-14 h-14 bg-[#b08d55] text-white rounded-lg flex flex-col items-center justify-center shadow-md overflow-hidden group hover:scale-105 transition-transform">
+            <span class="text-[8px] uppercase font-bold opacity-80 mt-1">Day</span>
+            <input id="day-counter" type="number" value="1" class="w-full bg-transparent text-center text-white text-2xl font-bold focus:outline-none focus:bg-[#9a7b4a] h-full pb-2" placeholder="#">
+        </div>
+
         <div class="space-y-0.5">
             <h1 id="main-title" class="font-bold tracking-wide text-2xl text-gray-800 uppercase">แผนพัฒนาตนเองรายวัน</h1>
             <p id="subtitle-text" class="text-sm text-[#b08d55] font-medium">Daily Self-Development Planner</p>
@@ -180,7 +180,7 @@
           <div class="p-3 flex-1 flex flex-col gap-2 overflow-y-auto">
            <div class="flex flex-col gap-1 h-full">
              <script>
-                // ปรับเหลือ 9 บรรทัด เพื่อความปลอดภัยของความสูง
+                // ลดเหลือ 9 บรรทัด เพื่อไม่ให้ล้นหน้า
                 for(let i=1; i<=9; i++){
                     document.write(`
                     <div class="flex items-center gap-2">
@@ -304,7 +304,7 @@
                 const isActive = el.classList.contains('bg-blue-400');
                 if(isActive) {
                     el.classList.remove('bg-blue-400', 'border-blue-400');
-                    el.classList.add('border-blue-400'); // keep border
+                    el.classList.add('border-blue-400');
                     el.dataset.checked = "false";
                 } else {
                     el.classList.add('bg-blue-400', 'border-blue-400');
@@ -314,6 +314,7 @@
             });
         });
 
+        // Event Listeners for inputs
         document.querySelectorAll('input, textarea, select').forEach(el => {
             el.addEventListener('input', saveData);
         });
@@ -321,24 +322,24 @@
 
     function saveData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
-            if(el.id) localStorage.setItem('pv6_' + el.id, el.value);
+            if(el.id) localStorage.setItem('pv7_' + el.id, el.value);
         });
-        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv6_sq_'+idx, el.dataset.checked));
-        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv6_w_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => localStorage.setItem('pv7_sq_'+idx, el.dataset.checked));
+        document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => localStorage.setItem('pv7_w_'+idx, el.dataset.checked));
     }
 
     function loadData() {
         document.querySelectorAll('input, textarea, select').forEach(el => {
             if(el.id) {
-                const val = localStorage.getItem('pv6_' + el.id);
+                const val = localStorage.getItem('pv7_' + el.id);
                 if(val !== null) el.value = val;
             }
         });
         document.querySelectorAll('[data-role="check-square"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv6_sq_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv7_sq_'+idx) === "true") el.click();
         });
         document.querySelectorAll('[data-role="water-drop"]').forEach((el, idx) => {
-            if(localStorage.getItem('pv6_w_'+idx) === "true") el.click();
+            if(localStorage.getItem('pv7_w_'+idx) === "true") el.click();
         });
     }
 
@@ -351,8 +352,17 @@
     }
 
     document.getElementById('reset-btn').addEventListener('click', () => {
-        if(confirm('ล้างข้อมูลเริ่มวันใหม่?')) {
-            Object.keys(localStorage).forEach(k => { if(k.startsWith('pv6_')) localStorage.removeItem(k); });
+        if(confirm('ล้างข้อมูลเพื่อเริ่มวันใหม่?')) {
+            // เก็บค่า Day Counter ไว้ก่อน
+            const currentDay = document.getElementById('day-counter').value;
+            // ล้างข้อมูลอื่น
+            Object.keys(localStorage).forEach(k => { 
+                if(k.startsWith('pv7_') && k !== 'pv7_day-counter') localStorage.removeItem(k); 
+            });
+            // อัปเดต Day Counter + 1 ให้อัตโนมัติ (Option เสริม)
+            if(currentDay && !isNaN(currentDay)) {
+                localStorage.setItem('pv7_day-counter', parseInt(currentDay) + 1);
+            }
             location.reload();
         }
     });
@@ -362,30 +372,32 @@
         const area = document.getElementById('planner-card');
         const originalStyle = area.getAttribute('style');
 
-        // บังคับขนาดให้ปลอดภัยสำหรับ A4 Inkjet (1058x700 px โดยประมาณ)
+        // Fix size for Inkjet Safety (1058x680px)
         area.style.width = '1058px'; 
-        area.style.height = '700px'; 
+        area.style.height = '680px'; // ลดความสูงลงอีกนิดให้ปลอดภัยสุดๆ
         area.style.position = 'fixed';
         area.style.top = '0'; 
         area.style.left = '0';
         area.style.zIndex = '-999';
         
         try {
-            const canvas = await html2canvas(area, { scale: 2, width: 1058, height: 700, useCORS: true });
+            const canvas = await html2canvas(area, { scale: 2, width: 1058, height: 680, useCORS: true });
             area.removeAttribute('style');
             if(originalStyle) area.setAttribute('style', originalStyle);
 
             const imgData = canvas.toDataURL('image/png');
             const pdf = new jsPDF('l', 'mm', 'a4');
+            
             // วางภาพโดยเว้นขอบเซฟตี้ 5mm
-            pdf.addImage(imgData, 'PNG', 5, 5, 280, 185);
+            pdf.addImage(imgData, 'PNG', 5, 5, 280, 180);
             
             const dateStr = document.getElementById('date-input').value.replace(/\//g,'-');
-            pdf.save(`Planner_Safe_Thai_${dateStr}.pdf`);
+            const dayCount = document.getElementById('day-counter').value;
+            pdf.save(`Planner_Day${dayCount}_${dateStr}.pdf`);
         } catch(e) {
             console.error(e);
             area.removeAttribute('style');
-            alert('Error PDF');
+            alert('เกิดข้อผิดพลาดในการสร้าง PDF');
         }
     });
 
